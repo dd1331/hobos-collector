@@ -33,7 +33,6 @@ describe('CollectorsService', () => {
         adm_cd: '3902011',
       });
       expect(data.errCd).toBe(0);
-      console.log('data', data);
     });
   });
 });
