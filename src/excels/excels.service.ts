@@ -56,6 +56,9 @@ export class ExcelsService {
       !province || !provinceCode || !cityCode || !city || !townCode || !town;
     return !isEmpty;
   }
+  async getAdminDistrictList() {
+    return await this.adminDistrictRepo.find();
+  }
 }
 type AdminDistrictType = {
   provinceCode: string;

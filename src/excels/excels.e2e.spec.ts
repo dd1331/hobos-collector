@@ -28,32 +28,37 @@ describe('ExcelsService', () => {
       expect(service.getWorkbook).toBeDefined();
       expect(service.getAdminDistrictData2save).toBeDefined();
       expect(service.createAdminDistrictData).toBeDefined();
+      expect(service.getAdminDistrictList).toBeDefined();
     });
-    it('should have matching title', async () => {
-      const path = '한국행정구역분류_행정동코드(7자리)_20210701기준.xlsx';
-      workbook = await service.getWorkbook(path);
-      expect(workbook.title).toBe('한국행정구역코드');
-    });
-    it('should return the same worksheet name', () => {
-      const worksheetName = '1. 총괄표(현행)';
-      worksheet = service.getWorksheet(workbook, worksheetName);
-      expect(worksheet.name).toBe(worksheetName);
-    });
-    it('', () => {
-      const data = service.getAdminDistrictData2save(worksheet);
+    // it('should have matching title', async () => {
+    //   const path = '한국행정구역분류_행정동코드(7자리)_20210701기준.xlsx';
+    //   workbook = await service.getWorkbook(path);
+    //   expect(workbook.title).toBe('한국행정구역코드');
+    // });
+    // it('should return the same worksheet name', () => {
+    //   const worksheetName = '1. 총괄표(현행)';
+    //   worksheet = service.getWorksheet(workbook, worksheetName);
+    //   expect(worksheet.name).toBe(worksheetName);
+    // });
+    // it('', () => {
+    //   const data = service.getAdminDistrictData2save(worksheet);
 
-      expect(data[0].provinceCode).toBeDefined();
-      expect(data[0].province).toBeDefined();
-      expect(data[0].cityCode).toBeDefined();
-      expect(data[0].city).toBeDefined();
-      expect(data[0].townCode).toBeDefined();
-      expect(data[0].town).toBeDefined();
-      adminDistrictDataList = data;
-    });
+    //   expect(data[0].provinceCode).toBeDefined();
+    //   expect(data[0].province).toBeDefined();
+    //   expect(data[0].cityCode).toBeDefined();
+    //   expect(data[0].city).toBeDefined();
+    //   expect(data[0].townCode).toBeDefined();
+    //   expect(data[0].town).toBeDefined();
+    //   adminDistrictDataList = data;
+    // });
+    // it('', async () => {
+    //   const data = await service.createAdminDistrictData(adminDistrictDataList);
+
+    //   expect(data.length).toBe(adminDistrictDataList.length);
+    // });
     it('', async () => {
-      const data = await service.createAdminDistrictData(adminDistrictDataList);
-
-      expect(data.length).toBe(adminDistrictDataList.length);
+      const data = await service.getAdminDistrictList();
+      expect(data.length).toBeGreaterThan(0);
     });
   });
 

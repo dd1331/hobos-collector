@@ -18,6 +18,7 @@ describe('CollectorsService', () => {
       expect(service).toBeDefined();
       expect(service.getAccessToken).toBeDefined();
       expect(service.getResidentInfo).toBeDefined();
+      expect(service.getGenderRatio).toBeDefined();
     });
     it('should return errCd 0 and accessToken', async () => {
       const data = await service.getAccessToken();
@@ -33,6 +34,21 @@ describe('CollectorsService', () => {
         adm_cd: '3902011',
       });
       expect(data.errCd).toBe(0);
+    });
+  });
+  describe('', () => {
+    it('', async () => {
+      const data = await service.getGenderRatio({
+        accessToken,
+        adm_cd: '11190',
+      });
+      expect(data.errCd).toBe(0);
+      expect(data.result[0].adm_nm).toBeDefined();
+      expect(data.result[0].f_per).toBeDefined();
+      expect(data.result[0].m_per).toBeDefined();
+      expect(data.result[0].f_ppl).toBeDefined();
+      expect(data.result[0].m_ppl).toBeDefined();
+      expect(data.result[0].total_ppl).toBeDefined();
     });
   });
 });
