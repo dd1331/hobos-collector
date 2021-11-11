@@ -1,16 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CollectorsService } from './collectors.service';
+import { AppModule } from '../app.module';
 
 describe('CollectorsService', () => {
+  jest.setTimeout(300000);
   let service: CollectorsService;
   let accessToken;
+  let app;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [CollectorsService],
+      imports: [AppModule],
     }).compile();
 
     service = module.get<CollectorsService>(CollectorsService);
+    app = module.createNestApplication();
+    await app.init();
+  });
+  afterAll(async () => {
+    await app.close();
   });
 
   describe('', () => {
@@ -19,6 +27,8 @@ describe('CollectorsService', () => {
       expect(service.getAccessToken).toBeDefined();
       expect(service.getResidentInfo).toBeDefined();
       expect(service.getGenderRatio).toBeDefined();
+      expect(service.getGenderRatioList).toBeDefined();
+      expect(service.createGenderRatioData).toBeDefined();
     });
     it('should return errCd 0 and accessToken', async () => {
       const data = await service.getAccessToken();
@@ -50,5 +60,17 @@ describe('CollectorsService', () => {
       expect(data.result[0].m_ppl).toBeDefined();
       expect(data.result[0].total_ppl).toBeDefined();
     });
+  });
+  it('', async () => {
+    const admCdList = ['11190', '11200'];
+    const data = await service.getGenderRatioList({
+      accessToken,
+      admCdList,
+    });
+    expect(data.length).toBe(admCdList.length);
+  });
+  it('', async () => {
+    // const data = await service.createGenderRatioData(accessToken);
+    // expect(data).toBeTruthy();
   });
 });

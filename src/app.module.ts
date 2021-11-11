@@ -2,9 +2,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CollectorsService } from './collectors/collectors.service';
 import { AdminDistrict } from './excels/entities/admin_district.entity';
 import { ExcelsModule } from './excels/excels.module';
+import { CollectorsModule } from './collectors/collectors.module';
+import { GenderRatio } from './collectors/entities/gender_ratio.entity';
 
 @Module({
   imports: [
@@ -15,12 +16,13 @@ import { ExcelsModule } from './excels/excels.module';
       username: 'charlie',
       password: '1331',
       database: 'hobos_test',
-      entities: [AdminDistrict],
+      entities: [AdminDistrict, GenderRatio],
       synchronize: true,
     }),
     ExcelsModule,
+    CollectorsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, CollectorsService],
+  providers: [AppService],
 })
 export class AppModule {}

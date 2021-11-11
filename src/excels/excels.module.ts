@@ -6,5 +6,6 @@ import { ExcelsService } from './excels.service';
 @Module({
   imports: [TypeOrmModule.forFeature([AdminDistrict])],
   providers: [ExcelsService],
+  exports: [ExcelsService],
 })
 export class ExcelsModule {}
