@@ -46,9 +46,9 @@ describe('ExcelsService', () => {
     //   expect(data[0].provinceCode).toBeDefined();
     //   expect(data[0].province).toBeDefined();
     //   expect(data[0].cityCode).toBeDefined();
-    //   expect(data[0].city).toBeDefined();
+    //   expect(data[0].cityName).toBeDefined();
     //   expect(data[0].townCode).toBeDefined();
-    //   expect(data[0].town).toBeDefined();
+    //   expect(data[0].townName).toBeDefined();
     //   adminDistrictDataList = data;
     // });
     // it('', async () => {

@@ -44,16 +44,21 @@ export class ExcelsService {
       provinceCode: row.getCell('B').text,
       province: row.getCell('C').text,
       cityCode: row.getCell('D').text,
-      city: row.getCell('E').text,
+      cityName: row.getCell('E').text,
       townCode: row.getCell('F').text,
-      town: row.getCell('G').text,
+      townName: row.getCell('G').text,
     };
   }
   isEmptyRow(row) {
-    const { provinceCode, province, cityCode, city, townCode, town } =
+    const { provinceCode, province, cityCode, cityName, townCode, townName } =
       this.getDataFromRow(row);
     const isEmpty =
-      !province || !provinceCode || !cityCode || !city || !townCode || !town;
+      !province ||
+      !provinceCode ||
+      !cityCode ||
+      !cityName ||
+      !townCode ||
+      !townName;
     return !isEmpty;
   }
   async getAdminDistrictList() {
@@ -68,7 +73,7 @@ type AdminDistrictType = {
   provinceCode: string;
   province: string;
   cityCode: string;
-  city: string;
+  cityName: string;
   townCode: string;
-  town: string;
+  townName: string;
 };

@@ -18,8 +18,8 @@ export class AdminDistrict {
   province: string;
 
   @Column()
-  city: string;
+  cityName: string;
 
   @Column({ nullable: true })
-  town: string;
+  townName: string;
 }
