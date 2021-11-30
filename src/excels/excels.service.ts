@@ -1,14 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Workbook, Worksheet } from 'exceljs';
-import { AdminDistrict } from './entities/admin_district.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, getRepository } from 'typeorm';
 @Injectable()
 export class ExcelsService {
-  constructor(
-    @InjectRepository(AdminDistrict)
-    private readonly adminDistrictRepo: Repository<AdminDistrict>,
-  ) {}
   async getWorkbook(path: string) {
     const workbook = new Workbook();
 
@@ -33,12 +26,7 @@ export class ExcelsService {
 
     return result;
   }
-  async createAdminDistrictData(data: AdminDistrictType[]) {
-    const adminDistrict = this.adminDistrictRepo.create(data);
-    const result = await this.adminDistrictRepo.save(adminDistrict);
 
-    return result;
-  }
   getDataFromRow(row) {
     return {
       provinceCode: row.getCell('B').text,
@@ -60,13 +48,6 @@ export class ExcelsService {
       !townCode ||
       !townName;
     return !isEmpty;
-  }
-  async getAdminDistrictList() {
-    return await getRepository(AdminDistrict)
-      .createQueryBuilder('adminDistrict')
-      .select('cityCode')
-      .groupBy('cityCode')
-      .getRawMany();
   }
 }
 type AdminDistrictType = {

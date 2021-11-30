@@ -27,8 +27,6 @@ describe('ExcelsService', () => {
       expect(service.getWorksheet).toBeDefined();
       expect(service.getWorkbook).toBeDefined();
       expect(service.getAdminDistrictData2save).toBeDefined();
-      expect(service.createAdminDistrictData).toBeDefined();
-      expect(service.getAdminDistrictList).toBeDefined();
     });
     // it('should have matching title', async () => {
     //   const path = '한국행정구역분류_행정동코드(7자리)_20210701기준.xlsx';
@@ -51,15 +49,6 @@ describe('ExcelsService', () => {
     //   expect(data[0].townName).toBeDefined();
     //   adminDistrictDataList = data;
     // });
-    // it('', async () => {
-    //   const data = await service.createAdminDistrictData(adminDistrictDataList);
-
-    //   expect(data.length).toBe(adminDistrictDataList.length);
-    // });
-    it('', async () => {
-      const data = await service.getAdminDistrictList();
-      expect(data.length).toBeGreaterThan(0);
-    });
   });
 
   afterAll(async () => {

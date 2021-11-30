@@ -1,17 +1,17 @@
 import { Injectable, HttpException } from '@nestjs/common';
 import axios from 'axios';
 import * as dayjs from 'dayjs';
-import { ExcelsService } from '../excels/excels.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GenderRatio } from './entities/gender_ratio.entity';
+import { DistrictsService } from '../districts/districts.service';
 
 @Injectable()
 export class CollectorsService {
   constructor(
     @InjectRepository(GenderRatio)
     private readonly genderRatioRepo: Repository<GenderRatio>,
-    private readonly excelsService: ExcelsService,
+    private readonly districService: DistrictsService,
   ) {}
   async getAccessToken() {
     try {
@@ -49,7 +49,7 @@ export class CollectorsService {
     return genderRatioList.map((genderRatio) => genderRatio.result[0]);
   }
   async createGenderRatioData(accessToken: string) {
-    const adminDistrictList = await this.excelsService.getAdminDistrictList();
+    const adminDistrictList = await this.districService.getAdminDistrictList();
     const admCdList = adminDistrictList.map((ad) => ad.cityCode);
     const genderRatioList = await this.getGenderRatioList({
       accessToken,

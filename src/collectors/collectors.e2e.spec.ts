@@ -19,8 +19,8 @@ describe('CollectorsService', () => {
   });
 
   describe('CollectorsService', () => {
-    it('get realtime air polution info', async () => {
-      // await service.createRealtimeAirpo
+    it('', () => {
+      // service.
     });
   });
 

@@ -3,10 +3,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AdminDistrict } from './excels/entities/admin_district.entity';
 import { ExcelsModule } from './excels/excels.module';
 import { CollectorsModule } from './collectors/collectors.module';
 import { GenderRatio } from './collectors/entities/gender_ratio.entity';
+import { DistrictsModule } from './districts/districts.module';
+import { AdminDistrict } from './districts/entities/admin_district.entity';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -22,6 +23,7 @@ import { GenderRatio } from './collectors/entities/gender_ratio.entity';
     }),
     ExcelsModule,
     CollectorsModule,
+    DistrictsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

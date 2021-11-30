@@ -70,36 +70,40 @@ describe('CollectorsService', () => {
     expect(data.length).toBe(admCdList.length);
   });
   const sidoNames = [
-    '서울',
-    '부산',
-    '대구',
-    '인천',
-    '광주',
-    '대전',
-    '울산',
-    '경기',
-    '강원',
-    '충북',
-    '충남',
-    '전북',
+    // '서울',
+    // '부산',
+    // '대구',
+    // '인천',
+    // '광주',
+    // '대전',
+    // '울산',
+    // '경기',
+    // '강원',
+    // '충북',
+    // '충남',
+    // '전북',
     '전남',
-    '경북',
-    '경남',
-    '제주',
-    '세종',
+    // '경북',
+    // '경남',
+    // '제주',
+    // '세종',
   ];
   each(sidoNames).it('get realtime air polution info', async (sidoName) => {
-    const results = await service.getRealtimeAirPolutionInfo(sidoName);
-    results.forEach((result) => {
-      expect(result.cityName).toBeDefined();
-      expect(result.createdAt).toBeDefined();
-      expect(result.o3Value).toBeDefined();
-      expect(result.pm10Value).toBeDefined();
-      expect(result.pm25Value).toBeDefined();
-      expect(result.sidoName).toBeDefined();
-    });
-  });
-  it('', () => {
-    // service.
+    const [result] = await service.getRealtimeAirPolutionInfo(sidoName);
+    expect(result.cityName).toBeDefined();
+    expect(result.createdAt).toBeDefined();
+    expect(result.o3Value).toBeDefined();
+    expect(result.pm10Value).toBeDefined();
+    expect(result.pm25Value).toBeDefined();
+    expect(result.sidoName).toBeDefined();
+
+    // results.forEach((result) => {
+    //   expect(result.cityName).toBeDefined();
+    //   expect(result.createdAt).toBeDefined();
+    //   expect(result.o3Value).toBeDefined();
+    //   expect(result.pm10Value).toBeDefined();
+    //   expect(result.pm25Value).toBeDefined();
+    //   expect(result.sidoName).toBeDefined();
+    // });
   });
 });
