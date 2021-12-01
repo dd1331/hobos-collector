@@ -89,6 +89,7 @@ describe('CollectorsService', () => {
     // '세종',
   ];
   each(sidoNames).it('get realtime air polution info', async (sidoName) => {
+    return;
     const [result] = await service.getRealtimeAirPolutionInfo(sidoName);
     expect(result.cityName).toBeDefined();
     expect(result.createdAt).toBeDefined();

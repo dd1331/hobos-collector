@@ -9,7 +9,7 @@ export class GenderRatio {
   provinceCode: string;
 
   @Column()
-  province: string;
+  provinceName: string;
 
   @Column()
   femaleRatio: string;

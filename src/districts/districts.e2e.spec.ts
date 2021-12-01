@@ -2,9 +2,10 @@ import { Test } from '@nestjs/testing';
 import { DistrictsService } from './districts.service';
 import { INestApplication } from '@nestjs/common';
 import { AppModule } from '../app.module';
+import { PROVINCE_NAMES_SHORT } from './districts.constants';
+import each from 'jest-each';
 
 describe('DistrictsService', () => {
-  // jest.setTimeout(30000);
   let app: INestApplication;
   let service;
 
@@ -27,16 +28,13 @@ describe('DistrictsService', () => {
       const data = await service.getAdminDistrictList();
       expect(data.length).toBeGreaterThan(0);
     });
-    // it('', async () => {
-    //   const data = await service.createAdminDistrictData(adminDistrictDataList);
-
-    //   expect(data.length).toBe(adminDistrictDataList.length);
-    // });
-  });
-  it('get realtime air polution info', async () => {
-    const result = await service.getCityNames();
-    console.log('result', result);
-    expect(result.length).toBeGreaterThan(200);
+    each(PROVINCE_NAMES_SHORT).it('get getCityNames', async (provinceName) => {
+      const [result] = await service.getCityNamesByProvinceName(provinceName);
+      const isIncluding = result.provinceName.includes(provinceName);
+      const isShortened =
+        result.provinceName[0] + result.provinceName[2] === provinceName;
+      expect(isIncluding || isShortened).toBeTruthy();
+    });
   });
 
   afterAll(async () => {

@@ -30,7 +30,7 @@ export class ExcelsService {
   getDataFromRow(row) {
     return {
       provinceCode: row.getCell('B').text,
-      province: row.getCell('C').text,
+      provinceName: row.getCell('C').text,
       cityCode: row.getCell('D').text,
       cityName: row.getCell('E').text,
       townCode: row.getCell('F').text,
@@ -38,10 +38,16 @@ export class ExcelsService {
     };
   }
   isEmptyRow(row) {
-    const { provinceCode, province, cityCode, cityName, townCode, townName } =
-      this.getDataFromRow(row);
+    const {
+      provinceCode,
+      provinceName,
+      cityCode,
+      cityName,
+      townCode,
+      townName,
+    } = this.getDataFromRow(row);
     const isEmpty =
-      !province ||
+      !provinceName ||
       !provinceCode ||
       !cityCode ||
       !cityName ||
@@ -52,7 +58,7 @@ export class ExcelsService {
 }
 type AdminDistrictType = {
   provinceCode: string;
-  province: string;
+  provinceName: string;
   cityCode: string;
   cityName: string;
   townCode: string;

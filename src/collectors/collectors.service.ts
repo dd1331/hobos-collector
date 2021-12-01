@@ -65,7 +65,7 @@ export class CollectorsService {
   private getGenderRatioDto(genderRatio) {
     return {
       provinceCode: genderRatio.adm_cd,
-      province: genderRatio.adm_nm,
+      provinceName: genderRatio.adm_nm,
       femaleRatio: genderRatio.f_per,
       maleRatio: genderRatio.m_per,
       femalePopulation: genderRatio.f_ppl,

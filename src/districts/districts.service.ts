@@ -25,15 +25,40 @@ export class DistrictsService {
   async getAdminDistrictList() {
     return await getRepository(AdminDistrict)
       .createQueryBuilder('adminDistrict')
-      .select('cityCode')
-      .groupBy('cityCode')
+      .select('city_code')
+      .groupBy('city_code')
       .getRawMany();
   }
-  async getCityNames() {
+  async getCityNamesByProvinceName(name) {
+    const provinceName = this.formatProvinceName(name);
     return await getRepository(AdminDistrict)
       .createQueryBuilder('adminDistrict')
-      .select('cityName')
-      .groupBy('cityName')
+      .select('city_name AS cityName')
+      .addSelect('province_name AS provinceName')
+      .where('province_name = :provinceName', { provinceName })
+      .andWhere('city_name IS NOT NULL')
+      .andWhere('province_name IS NOT NULL')
+      .groupBy('city_name')
       .getRawMany();
+  }
+
+  formatProvinceName(name) {
+    if (name === '서울') return '서울특별시';
+    if (name === '부산') return '부산광역시';
+    if (name === '인천') return '인천광역시';
+    if (name === '대구') return '대구광역시';
+    if (name === '광주') return '광주광역시';
+    if (name === '대전') return '대전광역시';
+    if (name === '울산') return '울산광역시';
+    if (name === '세종') return '세종특별자치시';
+    if (name === '경기') return '경기도';
+    if (name === '강원') return '강원도';
+    if (name === '충북') return '충청북도';
+    if (name === '충남') return '충청남도';
+    if (name === '전북') return '전라북도';
+    if (name === '전남') return '전라남도';
+    if (name === '경북') return '경상북도';
+    if (name === '경남') return '경상남도';
+    if (name === '제주') return '제주특별자치도';
   }
 }
