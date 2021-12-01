@@ -8,6 +8,8 @@ import { CollectorsModule } from './collectors/collectors.module';
 import { GenderRatio } from './collectors/entities/gender_ratio.entity';
 import { DistrictsModule } from './districts/districts.module';
 import { AdminDistrict } from './districts/entities/admin_district.entity';
+import { WeathersModule } from './weathers/weathers.module';
+import { Weather } from './weathers/entities/weather.entity';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -18,12 +20,14 @@ import { AdminDistrict } from './districts/entities/admin_district.entity';
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [AdminDistrict, GenderRatio],
+      entities: [Weather, AdminDistrict, GenderRatio],
       synchronize: true,
+      // dropSchema: true,
     }),
     ExcelsModule,
     CollectorsModule,
     DistrictsModule,
+    WeathersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

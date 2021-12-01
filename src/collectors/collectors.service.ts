@@ -1,6 +1,5 @@
-import { Injectable, HttpException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import * as dayjs from 'dayjs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GenderRatio } from './entities/gender_ratio.entity';
@@ -73,78 +72,7 @@ export class CollectorsService {
       totalPopulation: genderRatio.total_ppl,
     };
   }
-
-  async getRealtimeAirPolutionInfo(
-    sidoName: SidoName,
-  ): Promise<RealtimeAirPolutionInfo[]> {
-    try {
-      const url =
-        'http://apis.data.go.kr/B552584/ArpltnStatsSvc/getCtprvnMesureSidoLIst';
-      const params = this.getParams4RealtimeAirPolutionInfo(sidoName);
-      const { data, status, statusText } = await axios.get(url, { params });
-      const { header, body, pageNo } = data.response;
-      // TODO: retry depending on pageNo
-
-      if (header.resultCode !== '00')
-        throw new HttpException(statusText, status);
-
-      return this.formatRealtimeAirPolutionInfo(body.items);
-    } catch (error) {
-      // TODO: send noti
-    }
-  }
-  private getParams4RealtimeAirPolutionInfo(sidoName: string) {
-    return {
-      serviceKey:
-        'sqcYoxiPGJmWv+7+X1pPjExvgKbD5IhInUB7bJCtIQZ881DodxmENiH4r2FUHjL0F4cpDreKpxVIO/AeycV8Dw==',
-      sidoName,
-      searchCondition: 'HOUR',
-      returnType: 'json',
-      numOfRows: 100,
-    };
-  }
-
-  private formatRealtimeAirPolutionInfo(items): RealtimeAirPolutionInfo[] {
-    const result = items.map((item) => {
-      const realtimeAirPolutionInfo: RealtimeAirPolutionInfo = {
-        cityName: item.cityName,
-        sidoName: item.sidoName,
-        pm10Value: item.pm10Value || '수집중',
-        pm25Value: item.pm25value || '수집중',
-        o3Value: item.o3Value || '수집중',
-        createdAt: dayjs(item.dataTime).toDate(),
-      };
-      return realtimeAirPolutionInfo;
-    });
-    return result;
-  }
 }
-type RealtimeAirPolutionInfo = {
-  cityName: string;
-  sidoName: string;
-  pm10Value: string | '수집중';
-  pm25Value: string | '수집중';
-  o3Value: string | '수집중';
-  createdAt: Date;
-};
 type GenderRatioDto = ResidentInfoDto;
 type GenderRatioListDto = { accessToken: string; admCdList: string[] };
 type ResidentInfoDto = { accessToken: string; adm_cd: string };
-type SidoName =
-  | '서울'
-  | '부산'
-  | '대구'
-  | '인천'
-  | '광주'
-  | '대전'
-  | '울산'
-  | '경기'
-  | '강원'
-  | '충북'
-  | '충남'
-  | '전북'
-  | '전남'
-  | '경북'
-  | '경남'
-  | '제주'
-  | '세종';

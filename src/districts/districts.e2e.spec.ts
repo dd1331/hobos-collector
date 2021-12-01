@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { DistrictsService } from './districts.service';
 import { INestApplication } from '@nestjs/common';
 import { AppModule } from '../app.module';
-import { PROVINCE_NAMES_SHORT } from './districts.constants';
+import { PROVINCE_NAMES_SHORT } from '../constants/districts.constants';
 import each from 'jest-each';
 
 describe('DistrictsService', () => {
