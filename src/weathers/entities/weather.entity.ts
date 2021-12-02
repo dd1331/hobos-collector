@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
+import { AdminDistrict } from '../../districts/entities/admin_district.entity';
 
 @Entity()
 export class Weather {
@@ -22,4 +29,8 @@ export class Weather {
 
   @Column({ name: 'pm25_value', nullable: true })
   pm25Value: number;
+
+  @OneToOne(() => AdminDistrict, (adminDistrict) => adminDistrict.weather)
+  @JoinColumn()
+  adminDistrict: AdminDistrict;
 }

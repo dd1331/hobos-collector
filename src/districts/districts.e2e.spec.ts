@@ -21,11 +21,11 @@ describe('DistrictsService', () => {
 
   describe('DistrictsService', () => {
     it('should be defined', () => {
-      expect(service.getAdminDistrictList).toBeDefined();
+      expect(service.getCityList).toBeDefined();
       expect(service.createAdminDistrictData).toBeDefined();
     });
     it('', async () => {
-      const data = await service.getAdminDistrictList();
+      const data = await service.getCityList();
       expect(data.length).toBeGreaterThan(0);
     });
     each(PROVINCE_NAMES_SHORT).it('get getCityNames', async (provinceName) => {

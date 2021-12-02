@@ -16,9 +16,9 @@ export class ExcelsService {
     const rows = worksheet.getRows(4, rowEnd);
     const result: AdminDistrictType[] = [];
     rows
-      .filter((row) => {
-        return this.isEmptyRow(row);
-      })
+      // .filter((row) => {
+      //   return this.isEmptyRow(row);
+      // })
       .forEach((row) => {
         const data = this.getDataFromRow(row);
         result.push(data);

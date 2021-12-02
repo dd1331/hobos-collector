@@ -22,25 +22,28 @@ describe('WeathersService', () => {
   describe('WeathersService', () => {
     const dtos = [];
     it('get realtime air polution info', async () => {
-      for (const provinceName of PROVINCE_NAMES_SHORT) {
-        const provinceResults =
-          await service.getRealtimeAirPolutionInfoByProvinceName(provinceName);
-        provinceResults.forEach((result) => {
-          expect(result.cityName).toBeDefined();
-          expect(result.measuredAt).toBeDefined();
-          expect(result.o3Value).toBeDefined();
-          expect(result.pm10Value).toBeDefined();
-          expect(result.pm25Value).toBeDefined();
-          expect(result.provinceName).toBeDefined();
-        });
-        dtos.push(...provinceResults);
-      }
+      const promises = PROVINCE_NAMES_SHORT.map(async (provinceName) => {
+        return await service.getRealtimeAirPolutionInfoByProvinceName(
+          provinceName,
+        );
+      });
+      const results = await Promise.all(promises);
+      results.flat().forEach((result) => {
+        expect(result.cityName).toBeDefined();
+        expect(result.measuredAt).toBeDefined();
+        expect(result.o3Value).toBeDefined();
+        expect(result.pm10Value).toBeDefined();
+        expect(result.pm25Value).toBeDefined();
+        expect(result.provinceName).toBeDefined();
+      });
+      dtos.push(...results.flat());
     });
     it('create weather info', async () => {
-      for (const dto of dtos) {
-        const result = await service.upsertAirPolutionInfo(dto);
-        expect(result).toBeTruthy();
-      }
+      const promises = dtos.map(async (dto) => {
+        return await service.upsertAirPolutionInfo(dto);
+      });
+      const result = await Promise.all(promises);
+      expect(result.every((r) => r)).toBeTruthy();
     });
   });
 

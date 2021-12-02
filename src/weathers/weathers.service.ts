@@ -1,4 +1,4 @@
-import { Injectable, HttpException } from '@nestjs/common';
+import { Injectable, HttpException, Inject } from '@nestjs/common';
 import axios from 'axios';
 import { REALTIME_AIR_POLUTION_URL } from '../constants/public_data.constants';
 
@@ -6,12 +6,14 @@ import * as dayjs from 'dayjs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Weather } from './entities/weather.entity';
 import { Repository } from 'typeorm';
+import { DistrictsService } from '../districts/districts.service';
 
 @Injectable()
 export class WeathersService {
   constructor(
     @InjectRepository(Weather)
     private readonly weatherRepo: Repository<Weather>,
+    private readonly districtsService: DistrictsService,
   ) {}
   async getRealtimeAirPolutionInfoByProvinceName(
     provinceName: ProvinceName,
@@ -47,13 +49,15 @@ export class WeathersService {
 
   private formatRealtimeAirPolutionInfo(items): RealtimeAirPolutionInfo[] {
     const result = items.map((item) => {
+      const { cityName, sidoName, pm10Value, pm25Value, o3Value, dataTime } =
+        item;
       const realtimeAirPolutionInfo: RealtimeAirPolutionInfo = {
-        cityName: item.cityName,
-        provinceName: item.sidoName,
-        pm10Value: item.pm10Value || -1,
-        pm25Value: item.pm25value || -1,
-        o3Value: item.o3Value || -1,
-        measuredAt: dayjs(item.dataTime).toDate(),
+        cityName: cityName,
+        provinceName: sidoName,
+        pm10Value: pm10Value || -1,
+        pm25Value: pm25Value || -1,
+        o3Value: o3Value || -1,
+        measuredAt: dayjs(dataTime).toDate(),
       };
       return realtimeAirPolutionInfo;
     });
@@ -61,7 +65,8 @@ export class WeathersService {
   }
   async upsertAirPolutionInfo(dto: RealtimeAirPolutionInfo) {
     try {
-      return await this.weatherRepo.save(dto);
+      const weather = this.weatherRepo.create(dto);
+      return await this.weatherRepo.save(weather);
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') return true;
     }
@@ -70,9 +75,9 @@ export class WeathersService {
 type RealtimeAirPolutionInfo = {
   cityName: string;
   provinceName: string;
-  pm10Value: number | -1;
-  pm25Value: number | -1;
-  o3Value: number | -1;
+  pm10Value: number;
+  pm25Value: number;
+  o3Value: number;
   measuredAt: Date;
 };
 type ProvinceName =

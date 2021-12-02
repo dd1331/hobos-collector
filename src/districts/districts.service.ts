@@ -17,19 +17,14 @@ export class DistrictsService {
     private readonly adminDistrictRepo: Repository<AdminDistrict>,
   ) {}
   async createAdminDistrictData(data: AdminDistrictType[]) {
-    const adminDistrict = this.adminDistrictRepo.create(data);
-    const result = await this.adminDistrictRepo.save(adminDistrict);
+    const result = await this.adminDistrictRepo.save(data);
 
     return result;
   }
-  async getAdminDistrictList() {
-    return await getRepository(AdminDistrict)
-      .createQueryBuilder('adminDistrict')
-      .select('city_code')
-      .groupBy('city_code')
-      .getRawMany();
+  async getCityList() {
+    return await this.adminDistrictRepo.find({ where: { townCode: '' } });
   }
-  async getCityNamesByProvinceName(name) {
+  async getCityNamesByProvinceName(name: string) {
     const provinceName = this.formatProvinceName(name);
     return await getRepository(AdminDistrict)
       .createQueryBuilder('adminDistrict')
@@ -40,6 +35,18 @@ export class DistrictsService {
       .andWhere('province_name IS NOT NULL')
       .groupBy('city_name')
       .getRawMany();
+  }
+
+  async getAdminDistrictByProvinceName(provinceName: string) {
+    return await this.adminDistrictRepo.findOne({ where: { provinceName } });
+  }
+
+  async getCityListByCityName(originalCityName: string) {
+    const cityName =
+      originalCityName === '세종시' ? '세종특별자치시' : originalCityName;
+    return await this.adminDistrictRepo.findOne({
+      where: { cityName, townCode: '' },
+    });
   }
 
   formatProvinceName(name) {
