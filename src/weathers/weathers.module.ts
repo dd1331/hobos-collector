@@ -6,6 +6,5 @@ import { Weather } from './entities/weather.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Weather])],
   providers: [WeathersService],
-  exports: [WeathersService],
 })
 export class WeathersModule {}

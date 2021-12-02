@@ -5,7 +5,10 @@ export class Weather {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'city_name' })
+  @Column({ name: 'province_name' })
+  provinceName: string;
+
+  @Column({ name: 'city_name', unique: true })
   cityName: string;
 
   @Column({ name: 'measured_at' })

@@ -2,7 +2,6 @@ import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { AppModule } from '../app.module';
 import { WeathersService } from './weathers.service';
-import each from 'jest-each';
 import { PROVINCE_NAMES_SHORT } from '../constants/districts.constants';
 
 describe('WeathersService', () => {
@@ -21,26 +20,27 @@ describe('WeathersService', () => {
   });
 
   describe('WeathersService', () => {
-    const tasks = [];
+    const dtos = [];
     it('get realtime air polution info', async () => {
-      // for (const provinceName of PROVINCE_NAMES_SHORT) {
-      //   const provinceResults =
-      //     await service.getRealtimeAirPolutionInfoByProvinceName(provinceName);
-      //   provinceResults.forEach((result) => {
-      //     expect(result.cityName).toBeDefined();
-      //     expect(result.measuredAt).toBeDefined();
-      //     expect(result.o3Value).toBeDefined();
-      //     expect(result.pm10Value).toBeDefined();
-      //     expect(result.pm25Value).toBeDefined();
-      //     expect(result.provinceName).toBeDefined();
-      //   });
-      //   tasks.push(...provinceResults);
-      // }
+      for (const provinceName of PROVINCE_NAMES_SHORT) {
+        const provinceResults =
+          await service.getRealtimeAirPolutionInfoByProvinceName(provinceName);
+        provinceResults.forEach((result) => {
+          expect(result.cityName).toBeDefined();
+          expect(result.measuredAt).toBeDefined();
+          expect(result.o3Value).toBeDefined();
+          expect(result.pm10Value).toBeDefined();
+          expect(result.pm25Value).toBeDefined();
+          expect(result.provinceName).toBeDefined();
+        });
+        dtos.push(...provinceResults);
+      }
     });
-    it('create weather info', () => {
-      tasks.forEach((dto) => {
-        // const result = service.upsertAirPolutionInfo(dto);
-      });
+    it('create weather info', async () => {
+      for (const dto of dtos) {
+        const result = await service.upsertAirPolutionInfo(dto);
+        expect(result).toBeTruthy();
+      }
     });
   });
 
