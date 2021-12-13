@@ -48,7 +48,7 @@ export class CollectorsService {
     return genderRatioList.map((genderRatio) => genderRatio.result[0]);
   }
   async createGenderRatioData(accessToken: string) {
-    const adminDistrictList = await this.districService.getAdminDistrictList();
+    const adminDistrictList = await this.districService.getCityList();
     const admCdList = adminDistrictList.map((ad) => ad.cityCode);
     const genderRatioList = await this.getGenderRatioList({
       accessToken,

@@ -30,6 +30,18 @@ export class Weather {
   @Column({ name: 'pm25_value', nullable: true })
   pm25Value: number;
 
+  @Column({ nullable: true })
+  description: string;
+
+  @Column({ nullable: true })
+  temp: number;
+
+  @Column({ name: 'feels_like', nullable: true })
+  feelsLike: number;
+
+  @Column({ nullable: true })
+  humidity: number;
+
   @OneToOne(() => AdminDistrict, (adminDistrict) => adminDistrict.weather)
   @JoinColumn()
   adminDistrict: AdminDistrict;

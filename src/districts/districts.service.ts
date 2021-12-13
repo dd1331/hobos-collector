@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AdminDistrict } from '../districts/entities/admin_district.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, getRepository } from 'typeorm';
+import { Repository, getRepository, IsNull } from 'typeorm';
 type AdminDistrictType = {
   provinceCode: string;
   province: string;
@@ -22,10 +22,10 @@ export class DistrictsService {
     return result;
   }
   async getCityList() {
-    return await this.adminDistrictRepo.find({ where: { townCode: '' } });
+    return await this.adminDistrictRepo.find({ where: { townCode: IsNull() } });
   }
   async getCityNamesByProvinceName(name: string) {
-    const provinceName = this.formatProvinceName(name);
+    const provinceName = this.formatProvinceNameLong(name);
     return await getRepository(AdminDistrict)
       .createQueryBuilder('adminDistrict')
       .select('city_name AS cityName')
@@ -49,7 +49,7 @@ export class DistrictsService {
     });
   }
 
-  formatProvinceName(name) {
+  formatProvinceNameLong(name) {
     if (name === '서울') return '서울특별시';
     if (name === '부산') return '부산광역시';
     if (name === '인천') return '인천광역시';

@@ -16,9 +16,9 @@ export class ExcelsService {
     const rows = worksheet.getRows(4, rowEnd);
     const result: AdminDistrictType[] = [];
     rows
-      // .filter((row) => {
-      //   return this.isEmptyRow(row);
-      // })
+      .filter((row) => {
+        return this.isEmptyRow(row);
+      })
       .forEach((row) => {
         const data = this.getDataFromRow(row);
         result.push(data);
@@ -29,12 +29,12 @@ export class ExcelsService {
 
   getDataFromRow(row) {
     return {
-      provinceCode: row.getCell('B').text,
-      provinceName: row.getCell('C').text,
-      cityCode: row.getCell('D').text,
-      cityName: row.getCell('E').text,
-      townCode: row.getCell('F').text,
-      townName: row.getCell('G').text,
+      provinceCode: row.getCell('B').text || null,
+      provinceName: row.getCell('C').text || null,
+      cityCode: row.getCell('D').text || null,
+      cityName: row.getCell('E').text || null,
+      townCode: row.getCell('F').text || null,
+      townName: row.getCell('G').text || null,
     };
   }
   isEmptyRow(row) {
@@ -47,11 +47,11 @@ export class ExcelsService {
       townName,
     } = this.getDataFromRow(row);
     const isEmpty =
-      !provinceName ||
-      !provinceCode ||
-      !cityCode ||
-      !cityName ||
-      !townCode ||
+      !provinceName &&
+      !provinceCode &&
+      !cityCode &&
+      !cityName &&
+      !townCode &&
       !townName;
     return !isEmpty;
   }
