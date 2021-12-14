@@ -42,7 +42,7 @@ export class WeathersService {
       sidoName,
       searchCondition: 'HOUR',
       returnType: 'json',
-      numOfRows: '30',
+      numOfRows: '100',
     };
   }
 
@@ -97,7 +97,7 @@ export class WeathersService {
     return weatherInfoList;
   }
 
-  private async getWeatherInfo(result: WeatherInfo): Promise<{
+  private async getWeatherInfo(weatherInfo: WeatherInfo): Promise<{
     description: string;
     temp: number;
     feelsLike: number;
@@ -109,7 +109,7 @@ export class WeathersService {
         params: {
           lang: 'kr',
           appid: '4a93d60067a3dd5f2f5790f9472a6bd0',
-          q: result.cityName,
+          q: weatherInfo.cityName,
           units: 'metric',
         },
       },

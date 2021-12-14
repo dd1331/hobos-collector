@@ -24,11 +24,10 @@ describe('WeathersService', () => {
   describe('WeathersService', () => {
     const dtos = [];
     it('get realtime air polution info', async () => {
+      // maximum daily traffic is 500
       return;
       const promises = PROVINCE_NAMES_SHORT.map(async (provinceName) => {
-        return await service.getRealtimeAirPolutionInfoByProvinceName(
-          provinceName,
-        );
+        return await service.getAirPolutionInfoByProvince(provinceName);
       });
       const results = await Promise.all(promises);
       results.flat().forEach((result) => {
@@ -41,13 +40,14 @@ describe('WeathersService', () => {
       });
       dtos.push(...results.flat());
     });
-    // it('create weather info', async () => {
-    //   const promises = dtos.map(async (dto) => {
-    //     return await service.upsertAirPolutionInfo(dto);
-    //   });
-    //   const result = await Promise.all(promises);
-    //   expect(result.every((r) => r)).toBeTruthy();
-    // });
+    it('create weather info', async () => {
+      // return
+      const promises = dtos.map(async (dto) => {
+        return await service.upsertAirPolutionInfo(dto);
+      });
+      const result = await Promise.all(promises);
+      expect(result.every((r) => r)).toBeTruthy();
+    });
     it('', async () => {
       const result = await service.createWeatherInfo();
       // console.log(result);

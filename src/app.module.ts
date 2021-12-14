@@ -10,6 +10,7 @@ import { DistrictsModule } from './districts/districts.module';
 import { AdminDistrict } from './districts/entities/admin_district.entity';
 import { WeathersModule } from './weathers/weathers.module';
 import { Weather } from './weathers/entities/weather.entity';
+import { LocalsModule } from './locals/locals.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -28,6 +29,7 @@ import { Weather } from './weathers/entities/weather.entity';
     CollectorsModule,
     DistrictsModule,
     WeathersModule,
+    LocalsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
