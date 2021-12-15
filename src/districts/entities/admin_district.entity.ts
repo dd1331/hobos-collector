@@ -34,7 +34,4 @@ export class AdminDistrict {
 
   @Column({ name: 'town_name', nullable: true })
   townName: string;
-
-  @OneToOne(() => Weather, (weather) => weather.adminDistrict)
-  weather: Weather;
 }

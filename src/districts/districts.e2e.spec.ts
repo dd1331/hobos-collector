@@ -36,6 +36,13 @@ describe('DistrictsService', () => {
       expect(isIncluding || isShortened).toBeTruthy();
     });
   });
+  describe('getDistrictByCityName', () => {
+    it('', async () => {
+      const cityName = '시흥시';
+      const result = await service.getDistrictByCityName(cityName);
+      expect(result.cityName).toBe(cityName);
+    });
+  });
 
   afterAll(async () => {
     await app.close();

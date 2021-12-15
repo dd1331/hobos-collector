@@ -41,11 +41,11 @@ export class DistrictsService {
     return await this.adminDistrictRepo.findOne({ where: { provinceName } });
   }
 
-  async getCityListByCityName(originalCityName: string) {
+  async getDistrictByCityName(originalCityName: string) {
     const cityName =
       originalCityName === '세종시' ? '세종특별자치시' : originalCityName;
     return await this.adminDistrictRepo.findOne({
-      where: { cityName, townCode: '' },
+      where: { cityName, townCode: IsNull() },
     });
   }
 

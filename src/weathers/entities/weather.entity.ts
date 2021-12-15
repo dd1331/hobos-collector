@@ -41,8 +41,4 @@ export class Weather {
 
   @Column({ nullable: true })
   humidity: number;
-
-  @OneToOne(() => AdminDistrict, (adminDistrict) => adminDistrict.weather)
-  @JoinColumn()
-  adminDistrict: AdminDistrict;
 }

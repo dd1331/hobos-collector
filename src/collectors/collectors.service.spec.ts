@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CollectorsService } from './collectors.service';
 import { AppModule } from '../app.module';
-import each from 'jest-each';
+
 describe('CollectorsService', () => {
   jest.setTimeout(300000);
   let service: CollectorsService;

@@ -4,6 +4,8 @@ import { AppModule } from '../app.module';
 import { INestApplication } from '@nestjs/common';
 
 describe('LocalsService', () => {
+  jest.setTimeout(300000);
+
   let localsService: LocalsService;
   let app: INestApplication;
 
@@ -46,5 +48,27 @@ describe('LocalsService', () => {
       });
     });
   });
-  describe('', () => {});
+  describe('getAreaCodeFromVisitKorea', () => {
+    it('', async () => {
+      const result = await localsService.getAreaCodeFromVisitKorea();
+      expect(result.length).toBeGreaterThan(0);
+    });
+  });
+  describe('getCityCodeFromVisitKorea', () => {
+    it('', async () => {
+      const result = await localsService.getAreaCodeFromVisitKorea(31);
+      expect(result.length).toBeGreaterThan(0);
+    });
+  });
+  describe('getCityImagesFromVisitKorea', () => {
+    it('', async () => {
+      const result = await localsService.getLocalImagesFromVisitKorea('시흥시');
+      expect(result.every((r) => r.url)).toBeTruthy();
+    });
+  });
+  describe('createImage4Local', () => {
+    it('', async () => {
+      const result = await localsService.createImage4Local();
+    });
+  });
 });
