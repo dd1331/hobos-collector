@@ -3,14 +3,14 @@ import axios from 'axios';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GenderRatio } from './entities/gender_ratio.entity';
-import { DistrictsService } from '../districts/districts.service';
+import { LocalsService } from '../locals/locals.service';
 
 @Injectable()
 export class CollectorsService {
   constructor(
     @InjectRepository(GenderRatio)
     private readonly genderRatioRepo: Repository<GenderRatio>,
-    private readonly districService: DistrictsService,
+    private readonly localsService: LocalsService,
   ) {}
   async getAccessToken() {
     try {
@@ -48,8 +48,8 @@ export class CollectorsService {
     return genderRatioList.map((genderRatio) => genderRatio.result[0]);
   }
   async createGenderRatioData(accessToken: string) {
-    const adminDistrictList = await this.districService.getCityList();
-    const admCdList = adminDistrictList.map((ad) => ad.cityCode);
+    const districtList = await this.localsService.getCityList();
+    const admCdList = districtList.map((ad) => ad.cityCode);
     const genderRatioList = await this.getGenderRatioList({
       accessToken,
       admCdList,

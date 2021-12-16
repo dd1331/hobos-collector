@@ -6,11 +6,11 @@ import { AppService } from './app.service';
 import { ExcelsModule } from './excels/excels.module';
 import { CollectorsModule } from './collectors/collectors.module';
 import { GenderRatio } from './collectors/entities/gender_ratio.entity';
-import { DistrictsModule } from './districts/districts.module';
-import { AdminDistrict } from './districts/entities/admin_district.entity';
 import { WeathersModule } from './weathers/weathers.module';
 import { Weather } from './weathers/entities/weather.entity';
 import { LocalsModule } from './locals/locals.module';
+import { Local } from './locals/entites/local.entity';
+import { FileEntity } from './file.entity';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -21,13 +21,12 @@ import { LocalsModule } from './locals/locals.module';
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [AdminDistrict, GenderRatio, Weather],
+      entities: [GenderRatio, Weather, Local, FileEntity],
       synchronize: true,
       // dropSchema: true,
     }),
     ExcelsModule,
     CollectorsModule,
-    DistrictsModule,
     WeathersModule,
     LocalsModule,
   ],

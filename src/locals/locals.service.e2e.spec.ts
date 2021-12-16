@@ -68,7 +68,9 @@ describe('LocalsService', () => {
   });
   describe('createImage4Local', () => {
     it('', async () => {
+      return;
       const result = await localsService.createImage4Local();
+      expect(result.every((r) => r.files.length > 0));
     });
   });
 });

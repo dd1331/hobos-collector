@@ -3,17 +3,17 @@ import { LocalsService } from './locals.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LocalsController } from './locals.controller';
 import { Weather } from '../weathers/entities/weather.entity';
-import { AdminDistrict } from '../districts/entities/admin_district.entity';
-import { DistrictsModule } from '../districts/districts.module';
+import { Local } from './entites/local.entity';
 import { WeathersModule } from '../weathers/weathers.module';
+import { FileEntity } from '../file.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AdminDistrict, Weather]),
-    DistrictsModule,
+    TypeOrmModule.forFeature([Weather, Local, FileEntity]),
     WeathersModule,
   ],
   providers: [LocalsService],
   controllers: [LocalsController],
+  exports: [LocalsService],
 })
 export class LocalsModule {}

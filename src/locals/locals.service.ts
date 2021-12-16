@@ -1,26 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not, IsNull } from 'typeorm';
-import { AdminDistrict } from '../districts/entities/admin_district.entity';
+import { Repository, Not, IsNull, getRepository } from 'typeorm';
 import { Weather } from '../weathers/entities/weather.entity';
 import axios from 'axios';
 import { VISIT_KOREA_AREA_CODE_URL } from '../constants/public_data.constants';
-import { DistrictsService } from '../districts/districts.service';
+import { FileEntity } from '../file.entity';
+import { Local } from './entites/local.entity';
 
 @Injectable()
 export class LocalsService {
   constructor(
     @InjectRepository(Weather)
     private readonly weatherRepo: Repository<Weather>,
-    @InjectRepository(AdminDistrict)
-    private readonly adminDistrictRepo: Repository<AdminDistrict>,
-    private readonly districtsService: DistrictsService,
+    @InjectRepository(FileEntity)
+    private readonly fileRepo: Repository<FileEntity>,
+    @InjectRepository(Local)
+    private readonly localRepo: Repository<Local>,
   ) {}
   async getLocalRankingByCity(
     option: LocalRankingOption = { take: 9 },
   ): Promise<LocalRankingResult[]> {
     const { take } = option;
-    const cities = await this.adminDistrictRepo.find({
+    const cities = await this.localRepo.find({
       where: { townCode: IsNull(), cityCode: Not(IsNull()) },
       take,
     });
@@ -43,13 +44,12 @@ export class LocalsService {
   async getLocalImagesFromVisitKorea(
     cityName: string,
   ): Promise<{ title: string; url: string }[]> {
-    const district = await this.districtsService.getDistrictByCityName(
-      cityName,
-    );
+    const local = await this.getLocalByCityName(cityName);
     const provinceList = await this.getProvinceList();
-    const [matchingProvince] = provinceList.filter(
-      (province) => province.name === district.provinceName,
-    );
+    const [matchingProvince] = provinceList.filter((province) => {
+      return this.format4District(province.name) === local.provinceName;
+    });
+
     const test3 = await this.getAreaCodeFromVisitKorea(matchingProvince.code);
     const url =
       'http://api.visitkorea.or.kr/openapi/service/rest/KorService/areaBasedList';
@@ -59,7 +59,7 @@ export class LocalsService {
       pageNo: 1,
       numOfRows: 10,
       MobileOS: 'IOS',
-      MobileApp: 'hobos-collector2',
+      MobileApp: 'hobos-local2',
       areaCode: matchingProvince.code,
       arrange: 'Q',
       listYN: 'Y',
@@ -92,7 +92,7 @@ export class LocalsService {
 
     const numOfRows = '100';
     const MobileOS = 'IOS';
-    const MobileApp = 'hobos-collector2';
+    const MobileApp = 'hobos-local2';
     return { ServiceKey, numOfRows, MobileOS, MobileApp, areaCode };
   }
   async createImage4Local() {
@@ -100,17 +100,24 @@ export class LocalsService {
     const promises = provinceList.map(async (c) => {
       return await this.getAreaCodeFromVisitKorea(c.code);
     });
-    const cityList = await Promise.all(promises);
-    const promises2 = cityList.flat().map(async (c) => {
-      const res = await this.districtsService.getDistrictByCityName(c.name);
-      // TODO exception 청원군 마산시 진해시 북제주군 남제주군
-      if (res) {
-        // const image = await this.getLocalImagesFromVisitKorea(c.name);
-        // console.log(image);
+    const areaCodes = await Promise.all(promises);
+    const promises2 = areaCodes.flat().map(async (city) => {
+      const local = await this.getLocalByCityName(city.name);
+      // // TODO exception 청원군 마산시 진해시 북제주군 남제주군
+      if (local) {
+        const image = await this.getLocalImagesFromVisitKorea(
+          this.format4District(city.name),
+        );
+        const files = await this.fileRepo.save(image);
+        local.files = files;
+
+        await this.localRepo.save(local);
+
+        return local;
       }
-      return res;
     });
     const result = await Promise.all(promises2);
+    return result;
   }
   private getProvinceList() {
     return [
@@ -133,7 +140,7 @@ export class LocalsService {
       { code: 39, name: '제주도' },
     ];
   }
-  private format4adminDistrict(provinceName: string) {
+  private format4District(provinceName: string) {
     if (provinceName === '서울') return '서울특별시';
     if (provinceName === '인천') return '인천광역시';
     if (provinceName === '대전') return '대전광역시';
@@ -144,11 +151,63 @@ export class LocalsService {
     if (provinceName === '제주도') return '제주특별자치도';
     return provinceName;
   }
+  async createLocalData(data: LocalType[]) {
+    const local = await this.localRepo.create(data);
+
+    await this.localRepo.save(local);
+
+    return local;
+  }
+  async getCityList() {
+    return await this.localRepo.find({ where: { townCode: IsNull() } });
+  }
+  async getCityNamesByProvinceName(name: string) {
+    const provinceName = this.formatProvinceNameLong(name);
+    return await getRepository(Local)
+      .createQueryBuilder('Local')
+      .select('city_name AS cityName')
+      .addSelect('province_name AS provinceName')
+      .where('province_name = :provinceName', { provinceName })
+      .andWhere('city_name IS NOT NULL')
+      .andWhere('province_name IS NOT NULL')
+      .groupBy('city_name')
+      .getRawMany();
+  }
+
+  async getLocalByProvinceName(provinceName: string) {
+    return await this.localRepo.findOne({ where: { provinceName } });
+  }
+  async getLocalByCityName(originalCityName: string) {
+    const cityName =
+      originalCityName === '세종시' ? '세종특별자치시' : originalCityName;
+    return await this.localRepo.findOne({
+      where: { cityName, townCode: IsNull() },
+    });
+  }
+  private formatProvinceNameLong(name) {
+    if (name === '서울') return '서울특별시';
+    if (name === '부산') return '부산광역시';
+    if (name === '인천') return '인천광역시';
+    if (name === '대구') return '대구광역시';
+    if (name === '광주') return '광주광역시';
+    if (name === '대전') return '대전광역시';
+    if (name === '울산') return '울산광역시';
+    if (name === '세종') return '세종특별자치시';
+    if (name === '경기') return '경기도';
+    if (name === '강원') return '강원도';
+    if (name === '충북') return '충청북도';
+    if (name === '충남') return '충청남도';
+    if (name === '전북') return '전라북도';
+    if (name === '전남') return '전라남도';
+    if (name === '경북') return '경상북도';
+    if (name === '경남') return '경상남도';
+    if (name === '제주') return '제주특별자치도';
+  }
 }
 type LocalRankingOption = {
   take: number;
 };
-type LocalRankingResult = AdminDistrict & {
+type LocalRankingResult = Local & {
   o3Value: number;
   pm10Value: number;
   pm25Value: number;
@@ -156,4 +215,12 @@ type LocalRankingResult = AdminDistrict & {
   temp: number;
   feelsLike: number;
   humidity: number;
+};
+type LocalType = {
+  provinceCode: string;
+  province: string;
+  cityCode: string;
+  cityName: string;
+  townCode: string;
+  townName: string;
 };

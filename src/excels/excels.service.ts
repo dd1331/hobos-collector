@@ -11,19 +11,19 @@ export class ExcelsService {
     const worksheet = workbook.getWorksheet(name);
     return worksheet;
   }
-  getAdminDistrictData2save(worksheet: Worksheet) {
+  getLocalData2save(worksheet: Worksheet) {
     const rowEnd = worksheet.actualRowCount;
     const rows = worksheet.getRows(4, rowEnd);
-    const result: AdminDistrictType[] = [];
-    rows
+    const result: LocalType[] = rows
       .filter((row) => {
-        return this.isEmptyRow(row);
+        return this.isCityLevel(row);
       })
-      .forEach((row) => {
+      .map((row) => {
         const data = this.getDataFromRow(row);
-        result.push(data);
+        return data;
       });
 
+    console.log('ExcelsService -> getLocalData2save -> result', result);
     return result;
   }
 
@@ -36,6 +36,10 @@ export class ExcelsService {
       townCode: row.getCell('F').text || null,
       townName: row.getCell('G').text || null,
     };
+  }
+  isCityLevel(row) {
+    const { townName, cityName } = this.getDataFromRow(row);
+    return !townName && cityName;
   }
   isEmptyRow(row) {
     const {
@@ -56,7 +60,7 @@ export class ExcelsService {
     return !isEmpty;
   }
 }
-type AdminDistrictType = {
+type LocalType = {
   provinceCode: string;
   provinceName: string;
   cityCode: string;
