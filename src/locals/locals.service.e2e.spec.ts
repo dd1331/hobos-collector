@@ -27,7 +27,7 @@ describe('LocalsService', () => {
       expect(localsService).toBeDefined();
     });
     it('should return local info for main', async () => {
-      const results = await localsService.getLocalRankingByCity();
+      const results = await localsService.getLocalRankingByCity({ take: 9 });
       // active after data initialized
       // return;
       expect(results.length).toBeGreaterThan(0);
@@ -50,18 +50,21 @@ describe('LocalsService', () => {
   });
   describe('getAreaCodeFromVisitKorea', () => {
     it('', async () => {
+      return;
       const result = await localsService.getAreaCodeFromVisitKorea();
       expect(result.length).toBeGreaterThan(0);
     });
   });
   describe('getCityCodeFromVisitKorea', () => {
     it('', async () => {
+      return;
       const result = await localsService.getAreaCodeFromVisitKorea(31);
       expect(result.length).toBeGreaterThan(0);
     });
   });
   describe('getCityImagesFromVisitKorea', () => {
     it('', async () => {
+      return;
       const result = await localsService.getLocalImagesFromVisitKorea('시흥시');
       expect(result.every((r) => r.url)).toBeTruthy();
     });
@@ -71,6 +74,13 @@ describe('LocalsService', () => {
       return;
       const result = await localsService.createImage4Local();
       expect(result.every((r) => r.files.length > 0));
+    });
+  });
+  describe('getLocalDetail', () => {
+    it('', async () => {
+      const cityCode = 11020;
+      const result = await localsService.getLocalDetail(cityCode);
+      expect(result.cityCode).toBe(cityCode.toString());
     });
   });
 });

@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Param } from '@nestjs/common';
 import { LocalsService } from './locals.service';
 
 @Controller('locals')
@@ -7,5 +7,9 @@ export class LocalsController {
   @Get('ranking/city')
   getRanking(@Query() option) {
     return this.localsService.getLocalRankingByCity(option);
+  }
+  @Get(':cityCode')
+  getLocalDetailBy(@Param('cityCode') cityCode: number) {
+    return this.localsService.getLocalDetail(cityCode);
   }
 }

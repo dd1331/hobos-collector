@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Weather } from '../../weathers/entities/weather.entity';
 import { FileEntity } from '../../file.entity';
+import { Review } from '../../reviews/entities/review.entity';
 
 @Entity()
 export class Local {
@@ -18,10 +19,10 @@ export class Local {
   @Column({ name: 'province_code', comment: '시/도' })
   provinceCode: string;
 
+  @Index()
   @Column({ name: 'city_code', comment: '시/군/구', nullable: true })
   cityCode: string;
 
-  @Index()
   @Column({
     name: 'town_code',
     comment: '읍/면/동',
@@ -44,4 +45,7 @@ export class Local {
 
   @OneToMany(() => FileEntity, (file) => file.local)
   files: FileEntity[];
+
+  @OneToMany(() => Review, (review) => review.local)
+  reviews: Review[];
 }

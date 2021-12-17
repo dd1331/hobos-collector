@@ -18,12 +18,12 @@ export class LocalsService {
     private readonly localRepo: Repository<Local>,
   ) {}
   async getLocalRankingByCity(
-    option: LocalRankingOption = { take: 9 },
+    option: LocalRankingOption,
   ): Promise<LocalRankingResult[]> {
     const { take } = option;
     const cities = await this.localRepo.find({
       where: { townCode: IsNull(), cityCode: Not(IsNull()) },
-      take,
+      take: take || 9,
     });
 
     const result: LocalRankingResult[] = [];
@@ -173,6 +173,10 @@ export class LocalsService {
       .groupBy('city_name')
       .getRawMany();
   }
+  async getLocalDetail(cityCode: number) {
+    const local = await this.localRepo.findOne({ where: { cityCode } });
+    return local;
+  }
 
   async getLocalByProvinceName(provinceName: string) {
     return await this.localRepo.findOne({ where: { provinceName } });
@@ -183,6 +187,9 @@ export class LocalsService {
     return await this.localRepo.findOne({
       where: { cityName, townCode: IsNull() },
     });
+  }
+  async getLocalByCityCode(cityCode: string) {
+    return await this.localRepo.findOne({ cityCode });
   }
   private formatProvinceNameLong(name) {
     if (name === '서울') return '서울특별시';

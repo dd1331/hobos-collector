@@ -11,6 +11,8 @@ import { Weather } from './weathers/entities/weather.entity';
 import { LocalsModule } from './locals/locals.module';
 import { Local } from './locals/entites/local.entity';
 import { FileEntity } from './file.entity';
+import { ReviewsModule } from './reviews/reviews.module';
+import { Review } from './reviews/entities/review.entity';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -21,7 +23,7 @@ import { FileEntity } from './file.entity';
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [GenderRatio, Weather, Local, FileEntity],
+      entities: [GenderRatio, Weather, Local, FileEntity, Review],
       synchronize: true,
       // dropSchema: true,
     }),
@@ -29,6 +31,7 @@ import { FileEntity } from './file.entity';
     CollectorsModule,
     WeathersModule,
     LocalsModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

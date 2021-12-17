@@ -6,7 +6,7 @@ import * as dayjs from 'dayjs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Weather } from './entities/weather.entity';
 import { Repository } from 'typeorm';
-import { PROVINCE_NAMES_SHORT } from '../constants/districts.constants';
+import { PROVINCE_NAMES_SHORT } from '../constants/locals.constants';
 
 @Injectable()
 export class WeathersService {

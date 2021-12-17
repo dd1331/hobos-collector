@@ -2,13 +2,12 @@ import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { AppModule } from '../app.module';
 import { WeathersService } from './weathers.service';
-import { PROVINCE_NAMES_SHORT } from '../constants/districts.constants';
-import { DistrictsService } from '../districts/districts.service';
+import { PROVINCE_NAMES_SHORT } from '../constants/locals.constants';
 
 describe('WeathersService', () => {
   jest.setTimeout(30000);
   let app: INestApplication;
-  let service, districtsService;
+  let service;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -16,7 +15,6 @@ describe('WeathersService', () => {
     }).compile();
     service = moduleRef.get<WeathersService>(WeathersService);
     app = moduleRef.createNestApplication();
-    districtsService = moduleRef.get<DistrictsService>(DistrictsService);
 
     await app.init();
   });
