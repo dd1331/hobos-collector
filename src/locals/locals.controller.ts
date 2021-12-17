@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Param } from '@nestjs/common';
+import { Controller, Get, Query, Param, ParseIntPipe } from '@nestjs/common';
 import { LocalsService } from './locals.service';
 
 @Controller('locals')
@@ -9,7 +9,7 @@ export class LocalsController {
     return this.localsService.getLocalRankingByCity(option);
   }
   @Get(':cityCode')
-  getLocalDetailBy(@Param('cityCode') cityCode: number) {
+  getLocalDetailBy(@Param('cityCode', ParseIntPipe) cityCode: number) {
     return this.localsService.getLocalDetail(cityCode);
   }
 }

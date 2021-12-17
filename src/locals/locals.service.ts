@@ -174,7 +174,10 @@ export class LocalsService {
       .getRawMany();
   }
   async getLocalDetail(cityCode: number) {
-    const local = await this.localRepo.findOne({ where: { cityCode } });
+    const local = await this.localRepo.findOne({
+      where: { cityCode },
+      relations: ['reviews'],
+    });
     return local;
   }
 
