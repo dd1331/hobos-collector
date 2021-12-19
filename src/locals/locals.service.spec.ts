@@ -52,7 +52,6 @@ describe('LocalsService', () => {
       link: 'http://blog.naver.com/inmyseojae',
       category: '문화,예술>복합문화공간',
       description: '',
-      telephone: '',
       address: '전라남도 여수시 여서동 371-8',
       roadAddress: '전라남도 여수시 여문1로 22 자연드림 여서점 2층',
       mapx: '373295',

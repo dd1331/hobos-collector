@@ -9,6 +9,10 @@ import { Local } from './entites/local.entity';
 import { Place } from './entites/place.entity';
 import { UpdatePlaceDto } from './dto/update-place.dto';
 import { CreatePlaceDto } from './dto/create-place.dto';
+import {
+  LOCAL_NOT_FOUND_MESSAGE,
+  PLACE_NOT_FOUND_MESSAGE,
+} from '../constants/locals.constants';
 
 @Injectable()
 export class LocalsService {
@@ -223,7 +227,7 @@ export class LocalsService {
     const cityName = place.address.split(' ')[1];
     const local = await this.getLocalByCityName(cityName);
 
-    if (!local) throw new NotFoundException('지역 존재하지 않습니다');
+    if (!local) throw new NotFoundException(LOCAL_NOT_FOUND_MESSAGE);
 
     return await this.placeRepo.save({ ...place, local });
   }
@@ -231,7 +235,7 @@ export class LocalsService {
     const { id, description } = dto;
     const place = await this.placeRepo.findOne(id);
 
-    if (!place) throw new NotFoundException('장소정보가 존재하지 않습니다');
+    if (!place) throw new NotFoundException(PLACE_NOT_FOUND_MESSAGE);
 
     return await this.placeRepo.save({ ...place, description });
   }
