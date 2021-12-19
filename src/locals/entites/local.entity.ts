@@ -10,6 +10,7 @@ import {
 import { Weather } from '../../weathers/entities/weather.entity';
 import { FileEntity } from '../../file.entity';
 import { Review } from '../../reviews/entities/review.entity';
+import { Place } from './place.entity';
 
 @Entity()
 export class Local {
@@ -48,4 +49,7 @@ export class Local {
 
   @OneToMany(() => Review, (review) => review.local)
   reviews: Review[];
+
+  @OneToMany(() => Place, (place) => place.local)
+  places: Place[];
 }

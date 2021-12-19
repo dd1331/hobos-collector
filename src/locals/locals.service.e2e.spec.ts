@@ -35,7 +35,6 @@ describe('LocalsService', () => {
       const results = await localsService.getLocalRankingByCity({ take: 9 });
       // active after data initialized
       // return;
-      expect(results.length).toBeGreaterThan(0);
       results.forEach((result) => {
         expect(result.provinceCode).toBeTruthy();
         expect(result.cityCode).toBeTruthy();

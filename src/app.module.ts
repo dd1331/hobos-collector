@@ -13,6 +13,7 @@ import { Local } from './locals/entites/local.entity';
 import { FileEntity } from './file.entity';
 import { ReviewsModule } from './reviews/reviews.module';
 import { Review } from './reviews/entities/review.entity';
+import { Place } from './locals/entites/place.entity';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -23,7 +24,7 @@ import { Review } from './reviews/entities/review.entity';
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [GenderRatio, Weather, Local, FileEntity, Review],
+      entities: [GenderRatio, Weather, Local, FileEntity, Review, Place],
       synchronize: true,
       // dropSchema: true,
     }),

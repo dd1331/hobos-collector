@@ -7,7 +7,8 @@ import { LocalsService } from '../locals/locals.service';
 import { Weather } from '../weathers/entities/weather.entity';
 import { FileEntity } from '../file.entity';
 import { Local } from '../locals/entites/local.entity';
-import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { Place } from '../locals/entites/place.entity';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('ReviewsService', () => {
   let service: ReviewsService;
@@ -30,6 +31,7 @@ describe('ReviewsService', () => {
         { provide: getRepositoryToken(Review), useValue: mockedReviewRepo },
         { provide: getRepositoryToken(Weather), useValue: {} },
         { provide: getRepositoryToken(FileEntity), useValue: {} },
+        { provide: getRepositoryToken(Place), useValue: {} },
         { provide: getRepositoryToken(Local), useValue: mockedLocalRepo },
       ],
     }).compile();

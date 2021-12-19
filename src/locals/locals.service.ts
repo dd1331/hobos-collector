@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not, IsNull, getRepository } from 'typeorm';
 import { Weather } from '../weathers/entities/weather.entity';
@@ -6,6 +6,9 @@ import axios from 'axios';
 import { VISIT_KOREA_AREA_CODE_URL } from '../constants/public_data.constants';
 import { FileEntity } from '../file.entity';
 import { Local } from './entites/local.entity';
+import { Place } from './entites/place.entity';
+import { UpdatePlaceDto } from './dto/update-place.dto';
+import { CreatePlaceDto } from './dto/create-place.dto';
 
 @Injectable()
 export class LocalsService {
@@ -16,6 +19,8 @@ export class LocalsService {
     private readonly fileRepo: Repository<FileEntity>,
     @InjectRepository(Local)
     private readonly localRepo: Repository<Local>,
+    @InjectRepository(Place)
+    private readonly placeRepo: Repository<Place>,
   ) {}
   async getLocalRankingByCity(
     option: LocalRankingOption,
@@ -23,6 +28,7 @@ export class LocalsService {
     const { take } = option;
     const cities = await this.localRepo.find({
       where: { townCode: IsNull(), cityCode: Not(IsNull()) },
+      relations: ['files'],
       take: take || 9,
     });
 
@@ -213,6 +219,22 @@ export class LocalsService {
     if (name === '경남') return '경상남도';
     if (name === '제주') return '제주특별자치도';
   }
+  async createPlace(place: CreatePlaceDto) {
+    const cityName = place.address.split(' ')[1];
+    const local = await this.getLocalByCityName(cityName);
+
+    if (!local) throw new NotFoundException('지역 존재하지 않습니다');
+
+    return await this.placeRepo.save({ ...place, local });
+  }
+  async updatePlace(dto: UpdatePlaceDto) {
+    const { id, description } = dto;
+    const place = await this.placeRepo.findOne(id);
+
+    if (!place) throw new NotFoundException('장소정보가 존재하지 않습니다');
+
+    return await this.placeRepo.save({ ...place, description });
+  }
 }
 type LocalRankingOption = {
   take: number;
@@ -225,6 +247,7 @@ type LocalRankingResult = Local & {
   temp: number;
   feelsLike: number;
   humidity: number;
+  // images: FileEntity[];
 };
 type LocalType = {
   provinceCode: string;
