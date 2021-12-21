@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Local } from '../../locals/entites/local.entity';
 
 @Entity()
@@ -29,7 +35,10 @@ export class Place {
 
   @Column()
   mapy: string;
+  @Column({ name: 'local_id', nullable: true })
+  localId: number;
 
   @ManyToOne(() => Local, (local) => local.places)
+  @JoinColumn({ name: 'local_id' })
   local: Local;
 }

@@ -78,7 +78,7 @@ describe('PlacesService', () => {
           description,
           id: 3,
         });
-      // expect(result()).rejects.toThrowError(NotFoundException);
+      expect(result()).rejects.toThrowError(NotFoundException);
     });
   });
 });

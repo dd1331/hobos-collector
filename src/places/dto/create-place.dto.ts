@@ -10,8 +10,11 @@ import {
 export class CreatePlaceDto {
   @IsNotEmpty({ message: TITLE_IS_EMPTY_MESSAGE })
   title: string;
+
   link: string;
+
   category: string;
+
   description: string;
 
   @IsNotEmpty({ message: ADDRESS_IS_EMPTY_MESSAGE })

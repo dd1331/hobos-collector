@@ -14,11 +14,12 @@ import {
   MAPX_IS_EMPTY_MESSAGE,
   MAPY_IS_EMPTY_MESSAGE,
 } from '../constants/locals.constants';
+import { PlacesService } from './places.service';
 
 describe('PlacesService', () => {
   jest.setTimeout(300000);
 
-  // let localsService: LocalsService, reviewsService: ReviewsService;
+  let placesService: PlacesService;
   let app: INestApplication;
   let agent;
 
@@ -28,7 +29,7 @@ describe('PlacesService', () => {
     }).compile();
 
     // localsService = module.get<LocalsService>(LocalsService);
-    // reviewsService = module.get<ReviewsService>(ReviewsService);
+    placesService = module.get<PlacesService>(PlacesService);
     app = module.createNestApplication();
     await app.init();
     agent = app.getHttpServer();

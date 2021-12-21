@@ -30,7 +30,6 @@ export class LocalsService {
       relations: ['files'],
       take: take || 9,
     });
-    console.log('LocalsService -> cities', cities);
 
     const localRankingResults = await this.addWeatherToLocalRankingResult(
       cities,
