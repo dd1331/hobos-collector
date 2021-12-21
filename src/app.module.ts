@@ -13,7 +13,8 @@ import { Local } from './locals/entites/local.entity';
 import { FileEntity } from './file.entity';
 import { ReviewsModule } from './reviews/reviews.module';
 import { Review } from './reviews/entities/review.entity';
-import { Place } from './locals/entites/place.entity';
+import { PlacesModule } from './places/places.module';
+import { Place } from './places/entities/place.entity';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -33,6 +34,7 @@ import { Place } from './locals/entites/place.entity';
     WeathersModule,
     LocalsModule,
     ReviewsModule,
+    PlacesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

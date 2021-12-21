@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { Local } from './local.entity';
+import { Local } from '../../locals/entites/local.entity';
 
 @Entity()
 export class Place {

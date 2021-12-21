@@ -7,8 +7,8 @@ import { LocalsService } from '../locals/locals.service';
 import { Weather } from '../weathers/entities/weather.entity';
 import { FileEntity } from '../file.entity';
 import { Local } from '../locals/entites/local.entity';
-import { Place } from '../locals/entites/place.entity';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { Place } from '../places/entities/place.entity';
 
 describe('ReviewsService', () => {
   let service: ReviewsService;

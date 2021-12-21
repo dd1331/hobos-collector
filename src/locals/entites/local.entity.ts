@@ -10,7 +10,7 @@ import {
 import { Weather } from '../../weathers/entities/weather.entity';
 import { FileEntity } from '../../file.entity';
 import { Review } from '../../reviews/entities/review.entity';
-import { Place } from './place.entity';
+import { Place } from '../../places/entities/place.entity';
 
 @Entity()
 export class Local {
