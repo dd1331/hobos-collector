@@ -63,32 +63,30 @@ describe('LocalsService', () => {
       });
     });
   });
-  describe('getAreaCodeFromVisitKorea', () => {
+  describe('getAreaCodesFromVisitKorea', () => {
     it('', async () => {
       return;
-      const result = await localsService.getAreaCodeFromVisitKorea();
+      const result = await localsService.getAreaCodesFromVisitKorea();
       expect(result.length).toBeGreaterThan(0);
     });
   });
   describe('getCityCodeFromVisitKorea', () => {
     it('', async () => {
       return;
-      const result = await localsService.getAreaCodeFromVisitKorea(31);
+      const result = await localsService.getAreaCodesFromVisitKorea(31);
       expect(result.length).toBeGreaterThan(0);
     });
   });
   describe('getCityImagesFromVisitKorea', () => {
     it('', async () => {
       return;
-      const result = await localsService.getLocalImagesFromVisitKorea('시흥시');
-      expect(result.every((r) => r.url)).toBeTruthy();
+      const result = await localsService.getLocalImagesFromVisitKorea('제주시');
     });
   });
   describe('createImage4Local', () => {
     it('', async () => {
       return;
       const result = await localsService.createImage4Local();
-      expect(result.every((r) => r.files.length > 0));
     });
   });
   describe('getLocalDetail', () => {
@@ -125,7 +123,6 @@ describe('LocalsService', () => {
     });
   });
   describe('createPlace', () => {
-    const localCode = 11100;
     const dto: CreatePlaceDto = {
       title: '나만의서재',
       link: 'http://blog.naver.com/inmyseojae',

@@ -12,6 +12,8 @@ import { CreatePlaceDto } from './dto/create-place.dto';
 import {
   LOCAL_NOT_FOUND_MESSAGE,
   PLACE_NOT_FOUND_MESSAGE,
+  PROVINCE_LIST_FOR_VISIT_KOREA,
+  VISIT_KOREA_URL_FOR_IMAGE,
 } from '../constants/locals.constants';
 
 @Injectable()
@@ -35,67 +37,88 @@ export class LocalsService {
       relations: ['files'],
       take: take || 9,
     });
+    console.log('LocalsService -> cities', cities);
 
-    const result: LocalRankingResult[] = [];
-    const promises = cities.map(async (city) => {
+    const localRankingResults = await this.addWeatherToLocalRankingResult(
+      cities,
+    );
+
+    return localRankingResults;
+  }
+  private async addWeatherToLocalRankingResult(
+    cities: Local[],
+  ): Promise<LocalRankingResult[]> {
+    const results = cities.map(async (city) => {
       const weather = await this.weatherRepo.findOne({
         where: { cityName: city.cityName },
       });
-
-      result.push({ ...city, ...weather });
-
-      return city;
+      return { ...city, ...weather };
     });
-
-    await Promise.all(promises);
-
-    return result;
+    return await Promise.all(results);
   }
+
   async getLocalImagesFromVisitKorea(
     cityName: string,
   ): Promise<{ title: string; url: string }[]> {
     const local = await this.getLocalByCityName(cityName);
-    const provinceList = await this.getProvinceList();
-    const [matchingProvince] = provinceList.filter((province) => {
-      return this.format4District(province.name) === local.provinceName;
-    });
+    const [matchingProvince] = PROVINCE_LIST_FOR_VISIT_KOREA.filter(
+      (province) => this.format4District(province.name) === local.provinceName,
+    );
 
-    const test3 = await this.getAreaCodeFromVisitKorea(matchingProvince.code);
-    const url =
-      'http://api.visitkorea.or.kr/openapi/service/rest/KorService/areaBasedList';
-    const params = {
+    const sigunguCodes = await this.getAreaCodesFromVisitKorea(
+      matchingProvince.code,
+    );
+    const promises = sigunguCodes.map(async (sigungu) => {
+      const params = this.getVisitKoreaImageParams({
+        areaCode: matchingProvince.code,
+        sigunguCode: sigungu.code,
+      });
+
+      const result = await axios.get(VISIT_KOREA_URL_FOR_IMAGE, { params });
+      const totalCount = result.data.response.body.totalCount;
+      if (!totalCount) return [];
+      const innerImages = result.data.response.body.items.item;
+      return innerImages;
+    });
+    const images = await Promise.all(promises);
+
+    return images.map((i) => {
+      return { title: i.title, url: i.firstimage };
+    });
+  }
+  private getVisitKoreaImageParams(matchingProvince: {
+    areaCode: number;
+    sigunguCode: number;
+  }) {
+    const { areaCode, sigunguCode } = matchingProvince;
+    return {
       ServiceKey:
         'sqcYoxiPGJmWv+7+X1pPjExvgKbD5IhInUB7bJCtIQZ881DodxmENiH4r2FUHjL0F4cpDreKpxVIO/AeycV8Dw==',
       pageNo: 1,
       numOfRows: 10,
       MobileOS: 'IOS',
       MobileApp: 'hobos-local2',
-      areaCode: matchingProvince.code,
+      areaCode,
       arrange: 'Q',
       listYN: 'Y',
-      sigunguCode: 2,
-      // contentTypeId: 12,
+      sigunguCode,
     };
-    const result = await axios.get(url, { params });
-    return result.data.response.body.items.item.map((i) => {
-      return { title: i.title, url: i.firstimage };
-    });
   }
-  async getAreaCodeFromVisitKorea(
+
+  async getAreaCodesFromVisitKorea(
     areaCode?: number,
   ): Promise<{ code: number; name: string }[]> {
     const params = this.getParams4areaCode(areaCode);
     const { data } = await axios.get(VISIT_KOREA_AREA_CODE_URL, {
       params,
     });
+    const areaInfo = data.response.body.items.item;
     // TODO exception
-    if (!data.response.body.items.item.length)
-      return [{ code: -1, name: 'not found' }];
-    const result = data.response.body.items.item.map((i) => {
-      return { code: i.code, name: i.name };
-    });
-    return result;
+    if (!areaInfo.length) return [{ code: -1, name: 'not found' }];
+
+    return areaInfo;
   }
+
   private getParams4areaCode(areaCode?: number) {
     const ServiceKey =
       'sqcYoxiPGJmWv+7+X1pPjExvgKbD5IhInUB7bJCtIQZ881DodxmENiH4r2FUHjL0F4cpDreKpxVIO/AeycV8Dw==';
@@ -105,19 +128,34 @@ export class LocalsService {
     const MobileApp = 'hobos-local2';
     return { ServiceKey, numOfRows, MobileOS, MobileApp, areaCode };
   }
+
   async createImage4Local() {
-    const provinceList = this.getProvinceList();
-    const promises = provinceList.map(async (c) => {
-      return await this.getAreaCodeFromVisitKorea(c.code);
-    });
-    const areaCodes = await Promise.all(promises);
-    const promises2 = areaCodes.flat().map(async (city) => {
+    try {
+      const areaCodes = await this.getAreaCodes();
+      const locals = await this.addImagesToLocal(areaCodes.flat());
+
+      return locals;
+    } catch (error) {
+      console.log('createImage4Local -> error', error);
+    }
+  }
+  private async getAreaCodes() {
+    const areaCodes = PROVINCE_LIST_FOR_VISIT_KOREA.map(
+      async (province) => await this.getAreaCodesFromVisitKorea(province.code),
+    );
+    return await Promise.all(areaCodes);
+  }
+
+  private async addImagesToLocal(areaCodes: { code: number; name: string }[]) {
+    const locals = areaCodes.flat().map(async (city) => {
       const local = await this.getLocalByCityName(city.name);
       // // TODO exception 청원군 마산시 진해시 북제주군 남제주군
       if (local) {
+        const formattedCityName = this.format4District(city.name);
         const image = await this.getLocalImagesFromVisitKorea(
-          this.format4District(city.name),
+          formattedCityName,
         );
+
         const files = await this.fileRepo.save(image);
         local.files = files;
 
@@ -126,30 +164,9 @@ export class LocalsService {
         return local;
       }
     });
-    const result = await Promise.all(promises2);
-    return result;
+    return await Promise.all(locals);
   }
-  private getProvinceList() {
-    return [
-      { code: 1, name: '서울' },
-      { code: 2, name: '인천' },
-      { code: 3, name: '대전' },
-      { code: 4, name: '대구' },
-      { code: 5, name: '광주' },
-      { code: 6, name: '부산' },
-      { code: 7, name: '울산' },
-      { code: 8, name: '세종특별자치시' },
-      { code: 31, name: '경기도' },
-      { code: 32, name: '강원도' },
-      { code: 33, name: '충청북도' },
-      { code: 34, name: '충청남도' },
-      { code: 35, name: '경상북도' },
-      { code: 36, name: '경상남도' },
-      { code: 37, name: '전라북도' },
-      { code: 38, name: '전라남도' },
-      { code: 39, name: '제주도' },
-    ];
-  }
+
   private format4District(provinceName: string) {
     if (provinceName === '서울') return '서울특별시';
     if (provinceName === '인천') return '인천광역시';
@@ -195,8 +212,8 @@ export class LocalsService {
     return await this.localRepo.findOne({ where: { provinceName } });
   }
   async getLocalByCityName(originalCityName: string) {
-    const cityName =
-      originalCityName === '세종시' ? '세종특별자치시' : originalCityName;
+    const isSejong = originalCityName === '세종시';
+    const cityName = isSejong ? '세종특별자치시' : originalCityName;
     return await this.localRepo.findOne({
       where: { cityName, townCode: IsNull() },
     });
