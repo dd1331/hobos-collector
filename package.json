@@ -34,6 +34,8 @@
     "exceljs": "^4.3.0",
     "jest-each": "^27.4.2",
     "mysql2": "^2.3.3-rc.0",
+    "puppeteer": "^13.0.0",
+    "puppeteer-core": "^13.0.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.6",

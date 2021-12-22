@@ -1,12 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../app.module';
 import { INestApplication, HttpStatus } from '@nestjs/common';
-// import { ReviewsService } from '../reviews/reviews.service';
 import * as request from 'supertest';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import each from 'jest-each';
 import {
-  // PLACE_NOT_FOUND_MESSAGE,
   LOCAL_NOT_FOUND_MESSAGE,
   TITLE_IS_EMPTY_MESSAGE,
   ADDRESS_IS_EMPTY_MESSAGE,
@@ -28,7 +26,6 @@ describe('PlacesService', () => {
       imports: [AppModule],
     }).compile();
 
-    // localsService = module.get<LocalsService>(LocalsService);
     placesService = module.get<PlacesService>(PlacesService);
     app = module.createNestApplication();
     await app.init();
@@ -107,6 +104,16 @@ describe('PlacesService', () => {
       const { body } = await request(agent).post(`/places/place`).send(dto);
       expect(body.statusCode).toBe(expected);
       expect(body.message).toBe(LOCAL_NOT_FOUND_MESSAGE);
+    });
+  });
+  describe('getCafeRanking', () => {
+    it('', async () => {
+      const dto = { take: 10 };
+      const { body } = await request(agent)
+        .get(`/places/cafe/ranking`)
+        .query(dto)
+        .expect(HttpStatus.OK);
+      expect(body.length).toBe(dto.take);
     });
   });
 });

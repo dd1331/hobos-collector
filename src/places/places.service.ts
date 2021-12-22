@@ -12,12 +12,16 @@ import { Place } from '../places/entities/place.entity';
 import axios from 'axios';
 import { Local } from 'src/locals/entites/local.entity';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { FileEntity } from '../file.entity';
+import * as puppeteer from 'puppeteer';
 
 @Injectable()
 export class PlacesService {
   constructor(
     @InjectRepository(Place)
     private readonly placeRepo: Repository<Place>,
+    @InjectRepository(FileEntity)
+    private readonly fileRepo: Repository<FileEntity>,
     private readonly localsService: LocalsService,
   ) {}
   private readonly logger = new Logger(PlacesService.name);
@@ -57,6 +61,15 @@ export class PlacesService {
       console.log('PlacesService -> error', error);
     }
   }
+  async getCafeRanking(search) {
+    console.log('PlacesService -> getCafeRanking -> search', search);
+    const take = search.take || 8;
+    return await this.placeRepo.find({
+      take,
+      order: { title: 'DESC' },
+      relations: ['files'],
+    });
+  }
 
   // @Cron(CronExpression.EVERY_10_SECONDS)
   private async createSeedPlaceData(category = '카페') {
@@ -95,4 +108,66 @@ export class PlacesService {
     });
     await Promise.all(places);
   }
+  // @Cron(CronExpression.EVERY_10_SECONDS)
+  private async createImageForPlace() {
+    const places = await this.getPlacesMissingImage();
+    const browser = await puppeteer.launch();
+    const DO_AT_ONCE = 5;
+
+    const promises = places
+      .filter((t) => t)
+      .slice(0, DO_AT_ONCE)
+      .map(async (place) => {
+        const cityName = place.address.split(' ')[1];
+        const title = place.title.replace('<b>', '').replace('</b>', '');
+        const MAX_THUMBNAIL_LIMIT = 4;
+        try {
+          const page = await browser.newPage();
+          const selector =
+            '#main_pack > section.sc_new.sp_nimage._prs_img._imageSearchPC > div > div.photo_group._listGrid > div.photo_tile._grid > div';
+          const url = `https://search.naver.com/search.naver?where=image&sm=tab_jum&query=${cityName}+${title}`;
+
+          await page.goto(url);
+
+          const selected = await page.waitForSelector(selector);
+          if (!selected) return;
+
+          const imgElements = await page.$$(selector);
+
+          for (const imgEliment of imgElements.slice(0, MAX_THUMBNAIL_LIMIT)) {
+            const url = await this.getUrl(imgEliment);
+            this.logger.debug(cityName + place.title, '장소 이미지 크롤링');
+            await this.fileRepo.save({ url, place });
+          }
+        } catch (error) {
+          await this.placeRepo.delete(place);
+        }
+      });
+
+    await Promise.all(promises);
+
+    await browser.close();
+  }
+
+  private async getUrl(imgEliment: puppeteer.ElementHandle<Element>) {
+    const imgSelector = 'div.thumb > a > img';
+    const url = await imgEliment.$eval(
+      imgSelector,
+      (element) => `${element.getAttribute('src')}`,
+    );
+    return url;
+  }
+
+  private async getPlacesMissingImage() {
+    const places = await this.placeRepo.find();
+    const getPlacesMissingImage = places.map(async (place) => {
+      const existing = await this.fileRepo.findOne({
+        where: { placeId: place.id },
+      });
+      if (existing) return;
+      return place;
+    });
+    return await Promise.all(getPlacesMissingImage);
+  }
 }
+// #main_pack > section.sc_new.sp_nimage._prs_img._imageSearchPC > div > div.photo_group._listGrid > div.photo_tile._grid > div:nth-child(1) > div > div.thumb > a > img

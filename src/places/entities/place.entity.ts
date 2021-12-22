@@ -4,8 +4,10 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Local } from '../../locals/entites/local.entity';
+import { FileEntity } from 'src/file.entity';
 
 @Entity()
 export class Place {
@@ -41,4 +43,7 @@ export class Place {
   @ManyToOne(() => Local, (local) => local.places)
   @JoinColumn({ name: 'local_id' })
   local: Local;
+
+  @OneToMany(() => FileEntity, (file) => file.place)
+  files: FileEntity[];
 }
