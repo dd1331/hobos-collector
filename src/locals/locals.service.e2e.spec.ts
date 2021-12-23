@@ -4,6 +4,7 @@ import { AppModule } from '../app.module';
 import { INestApplication, HttpStatus } from '@nestjs/common';
 import { ReviewsService } from '../reviews/reviews.service';
 import * as request from 'supertest';
+import each from 'jest-each';
 
 describe('LocalsService', () => {
   jest.setTimeout(300000);
@@ -27,15 +28,15 @@ describe('LocalsService', () => {
     await app.close();
   });
 
-  describe('', () => {
-    it('should be defined', () => {
-      expect(localsService).toBeDefined();
-    });
-    it('should return local info for main', async () => {
-      const results = await localsService.getLocalRankingByCity({ take: 9 });
-      // active after data initialized
-      // return;
-      results.forEach((result) => {
+  describe('getLocalRanking', () => {
+    it('take 만큼 반환', async () => {
+      const take = 13;
+      const { body } = await request(agent)
+        .get('/locals/ranking')
+        .query({ take })
+        .expect(HttpStatus.OK);
+      expect(body.length).toBe(take);
+      body.forEach((result) => {
         expect(result.provinceCode).toBeTruthy();
         expect(result.cityCode).toBeTruthy();
         expect(result.townCode).toBeFalsy();
@@ -50,6 +51,67 @@ describe('LocalsService', () => {
         expect(result.feelsLike).toBeDefined();
         expect(result.humidity).toBeDefined();
       });
+    });
+    it('기본 9개 반환', async () => {
+      const DEFAULT_TAKE = 9;
+      const { body } = await request(agent)
+        .get('/locals/ranking')
+        .query({
+          take: DEFAULT_TAKE,
+        })
+        .expect(HttpStatus.OK);
+      expect(body.length).toBe(DEFAULT_TAKE);
+    });
+    it('리턴할 값', async () => {
+      const { body } = await request(agent)
+        .get('/locals/ranking')
+        .expect(HttpStatus.OK);
+
+      body.forEach((result) => {
+        expect(result.provinceCode).toBeTruthy();
+        expect(result.cityCode).toBeTruthy();
+        expect(result.townCode).toBeFalsy();
+        expect(result.provinceName).toBeTruthy();
+        expect(result.cityName).toBeTruthy();
+        expect(result.townName).toBeFalsy();
+        expect(result.o3Value).toBeDefined();
+        expect(result.pm10Value).toBeDefined();
+        expect(result.pm25Value).toBeDefined();
+        expect(result.description).toBeDefined();
+        expect(result.temp).toBeDefined();
+        expect(result.feelsLike).toBeDefined();
+        expect(result.humidity).toBeDefined();
+      });
+    });
+    const provinceNames = [
+      '서울',
+      '부산',
+      '대구',
+      '인천',
+      '광주',
+      '대전',
+      '울산',
+      '세종',
+      '경기',
+      '강원',
+      '충북',
+      '충남',
+      '전북',
+      '전남',
+      '경북',
+      '경남',
+      '제주',
+    ];
+    each(provinceNames).it('시/도별 필터링', async (provinceName) => {
+      const { body } = await request(agent)
+        .get('/locals/ranking')
+        .query({ provinceName })
+        .expect(HttpStatus.OK);
+
+      body.map((t) => t.provinceName);
+      expect(
+        body.every((local) => local.provinceName === provinceName),
+      ).toBeTruthy();
     });
   });
   describe('getAreaCodesFromVisitKorea', () => {

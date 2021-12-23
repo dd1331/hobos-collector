@@ -4,9 +4,9 @@ import { LocalsService } from './locals.service';
 @Controller('locals')
 export class LocalsController {
   constructor(private readonly localsService: LocalsService) {}
-  @Get('ranking/city')
+  @Get('ranking')
   getRanking(@Query() option) {
-    return this.localsService.getLocalRankingByCity(option);
+    return this.localsService.getLocalRanking(option);
   }
   @Get(':cityCode')
   getLocalDetailBy(@Param('cityCode', ParseIntPipe) cityCode: number) {

@@ -7,7 +7,7 @@ import { FileEntity } from '../file.entity';
 
 describe('LocalsService', () => {
   let service: LocalsService;
-  let mockedLocalRepo, mockedPlaceRepo;
+  let mockedLocalRepo, mockedWeatherRepo;
 
   beforeEach(async () => {
     mockedLocalRepo = {
@@ -15,13 +15,21 @@ describe('LocalsService', () => {
         const { where } = option;
         return Promise.resolve({ ...where });
       },
+      find: (option): Promise<Partial<Local>[]> => {
+        return Promise.resolve([{}, {}]);
+      },
+    };
+    mockedWeatherRepo = {
+      findOne: (): Promise<Partial<Weather[]>> => {
+        return Promise.resolve([]);
+      },
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         LocalsService,
         { provide: getRepositoryToken(Local), useValue: mockedLocalRepo },
-        { provide: getRepositoryToken(Weather), useValue: {} },
+        { provide: getRepositoryToken(Weather), useValue: mockedWeatherRepo },
         { provide: getRepositoryToken(FileEntity), useValue: {} },
       ],
     }).compile();

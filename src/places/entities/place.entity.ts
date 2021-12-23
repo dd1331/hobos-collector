@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Local } from '../../locals/entites/local.entity';
-import { FileEntity } from 'src/file.entity';
+import { FileEntity } from '../../file.entity';
 
 @Entity()
 export class Place {

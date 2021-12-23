@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not, IsNull, getRepository } from 'typeorm';
+import {
+  Repository,
+  Not,
+  IsNull,
+  getRepository,
+  FindConditions,
+} from 'typeorm';
 import { Weather } from '../weathers/entities/weather.entity';
 import axios from 'axios';
 import { VISIT_KOREA_AREA_CODE_URL } from '../constants/public_data.constants';
@@ -21,14 +27,22 @@ export class LocalsService {
     @InjectRepository(Local)
     private readonly localRepo: Repository<Local>,
   ) {}
-  async getLocalRankingByCity(
-    option: LocalRankingOption,
+  async getLocalRanking(
+    option?: LocalRankingOption,
   ): Promise<LocalRankingResult[]> {
-    const { take } = option;
+    const take = option?.take || 9;
+    const where: FindConditions<Local> = {
+      townCode: IsNull(),
+      cityCode: Not(IsNull()),
+    };
+
+    if (option?.provinceName)
+      where.provinceName = this.format4District(option.provinceName);
+
     const cities = await this.localRepo.find({
-      where: { townCode: IsNull(), cityCode: Not(IsNull()) },
+      where,
       relations: ['files'],
-      take: take || 9,
+      take,
     });
 
     const localRankingResults = await this.addWeatherToLocalRankingResult(
@@ -42,7 +56,7 @@ export class LocalsService {
   ): Promise<LocalRankingResult[]> {
     const results = cities.map(async (city) => {
       const weather = await this.weatherRepo.findOne({
-        where: { cityName: city.cityName },
+        where: { cityName: city.cityName, provinceName: city.provinceName },
       });
       return { ...city, ...weather };
     });
@@ -160,14 +174,14 @@ export class LocalsService {
   }
 
   private format4District(provinceName: string) {
-    if (provinceName === '서울') return '서울특별시';
-    if (provinceName === '인천') return '인천광역시';
-    if (provinceName === '대전') return '대전광역시';
-    if (provinceName === '대구') return '대구광역시';
-    if (provinceName === '광주') return '광주광역시';
-    if (provinceName === '부산') return '부산광역시';
-    if (provinceName === '울산') return '울산광역시';
-    if (provinceName === '제주도') return '제주특별자치도';
+    if (provinceName === '서울') return '서울';
+    if (provinceName === '인천') return '인천';
+    if (provinceName === '대전') return '대전';
+    if (provinceName === '대구') return '대구';
+    if (provinceName === '광주') return '광주';
+    if (provinceName === '부산') return '부산';
+    if (provinceName === '울산') return '울산';
+    if (provinceName === '제주도') return '제주';
     return provinceName;
   }
   async createLocalData(data: LocalType[]) {
@@ -205,7 +219,7 @@ export class LocalsService {
   }
   async getLocalByCityName(originalCityName: string) {
     const isSejong = originalCityName === '세종시';
-    const cityName = isSejong ? '세종특별자치시' : originalCityName;
+    const cityName = isSejong ? '세종' : originalCityName;
     return await this.localRepo.findOne({
       where: { cityName, townCode: IsNull() },
     });
@@ -214,14 +228,14 @@ export class LocalsService {
     return await this.localRepo.findOne({ cityCode });
   }
   private formatProvinceNameLong(name) {
-    if (name === '서울') return '서울특별시';
-    if (name === '부산') return '부산광역시';
-    if (name === '인천') return '인천광역시';
-    if (name === '대구') return '대구광역시';
-    if (name === '광주') return '광주광역시';
-    if (name === '대전') return '대전광역시';
-    if (name === '울산') return '울산광역시';
-    if (name === '세종') return '세종특별자치시';
+    if (name === '서울') return '서울';
+    if (name === '부산') return '부산';
+    if (name === '인천') return '인천';
+    if (name === '대구') return '대구';
+    if (name === '광주') return '광주';
+    if (name === '대전') return '대전';
+    if (name === '울산') return '울산';
+    if (name === '세종') return '세종';
     if (name === '경기') return '경기도';
     if (name === '강원') return '강원도';
     if (name === '충북') return '충청북도';
@@ -234,7 +248,8 @@ export class LocalsService {
   }
 }
 type LocalRankingOption = {
-  take: number;
+  take?: number;
+  provinceName: string;
 };
 type LocalRankingResult = Local & {
   o3Value: number;
