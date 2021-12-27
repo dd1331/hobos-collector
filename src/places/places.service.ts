@@ -62,7 +62,6 @@ export class PlacesService {
     }
   }
   async getCafeRanking(search) {
-    console.log('PlacesService -> getCafeRanking -> search', search);
     const take = search.take || 8;
     return await this.placeRepo.find({
       take,

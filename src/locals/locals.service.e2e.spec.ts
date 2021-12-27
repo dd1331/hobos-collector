@@ -172,5 +172,10 @@ describe('LocalsService', () => {
       const { body } = await request(agent).get(`/locals/string`);
       expect(body.statusCode).toBe(HttpStatus.BAD_REQUEST);
     });
+    it('장소정보 가져오기', async () => {
+      const cityCode = 11020;
+      const { body } = await request(agent).get(`/locals/${cityCode}`);
+      expect(body.places).toBeTruthy();
+    });
   });
 });

@@ -36,8 +36,7 @@ export class LocalsService {
       cityCode: Not(IsNull()),
     };
 
-    if (option?.provinceName)
-      where.provinceName = this.format4District(option.provinceName);
+    if (option?.provinceName) where.provinceName = option.provinceName;
 
     const cities = await this.localRepo.find({
       where,
@@ -66,31 +65,35 @@ export class LocalsService {
   async getLocalImagesFromVisitKorea(
     cityName: string,
   ): Promise<{ title: string; url: string }[]> {
-    const local = await this.getLocalByCityName(cityName);
-    const [matchingProvince] = PROVINCE_LIST_FOR_VISIT_KOREA.filter(
-      (province) => this.format4District(province.name) === local.provinceName,
-    );
+    try {
+      const local = await this.getLocalByCityName(cityName);
+      const [matchingProvince] = PROVINCE_LIST_FOR_VISIT_KOREA.filter(
+        (province) => province.name === local.provinceName,
+      );
 
-    const sigunguCodes = await this.getAreaCodesFromVisitKorea(
-      matchingProvince.code,
-    );
-    const promises = sigunguCodes.map(async (sigungu) => {
-      const params = this.getVisitKoreaImageParams({
-        areaCode: matchingProvince.code,
-        sigunguCode: sigungu.code,
+      const sigunguCodes = await this.getAreaCodesFromVisitKorea(
+        matchingProvince.code,
+      );
+      const promises = sigunguCodes.map(async (sigungu) => {
+        const params = this.getVisitKoreaImageParams({
+          areaCode: matchingProvince.code,
+          sigunguCode: sigungu.code,
+        });
+
+        const result = await axios.get(VISIT_KOREA_URL_FOR_IMAGE, { params });
+        const totalCount = result.data.response.body.totalCount;
+        if (!totalCount) return [];
+        const innerImages = result.data.response.body.items.item;
+        return innerImages;
       });
+      const images = await Promise.all(promises);
 
-      const result = await axios.get(VISIT_KOREA_URL_FOR_IMAGE, { params });
-      const totalCount = result.data.response.body.totalCount;
-      if (!totalCount) return [];
-      const innerImages = result.data.response.body.items.item;
-      return innerImages;
-    });
-    const images = await Promise.all(promises);
-
-    return images.map((i) => {
-      return { title: i.title, url: i.firstimage };
-    });
+      return images.map((i) => {
+        return { title: i.title, url: i.firstimage };
+      });
+    } catch (error) {
+      console.log('LocalsService -> error', error);
+    }
   }
   private getVisitKoreaImageParams(matchingProvince: {
     areaCode: number;
@@ -153,35 +156,48 @@ export class LocalsService {
   }
 
   private async addImagesToLocal(areaCodes: { code: number; name: string }[]) {
-    const locals = areaCodes.flat().map(async (city) => {
-      const local = await this.getLocalByCityName(city.name);
-      // // TODO exception 청원군 마산시 진해시 북제주군 남제주군
-      if (local) {
-        const formattedCityName = this.format4District(city.name);
-        const image = await this.getLocalImagesFromVisitKorea(
-          formattedCityName,
-        );
+    try {
+      const locals = areaCodes.flat().map(async (city) => {
+        const local = await this.getLocalByCityName(city.name);
+        // // TODO exception 청원군 마산시 진해시 북제주군 남제주군
+        if (local) {
+          const formattedCityName = city.name;
+          const image = await this.getLocalImagesFromVisitKorea(
+            formattedCityName,
+          );
 
-        const files = await this.fileRepo.save(image);
-        local.files = files;
+          const files = await this.fileRepo.save(image);
+          local.files = files;
 
-        await this.localRepo.save(local);
+          await this.localRepo.save(local);
 
-        return local;
-      }
-    });
-    return await Promise.all(locals);
+          return local;
+        }
+      });
+      return await Promise.all(locals);
+    } catch (error) {
+      console.log('addImagesToLocal -> error', error);
+    }
   }
 
-  private format4District(provinceName: string) {
-    if (provinceName === '서울') return '서울';
-    if (provinceName === '인천') return '인천';
-    if (provinceName === '대전') return '대전';
-    if (provinceName === '대구') return '대구';
-    if (provinceName === '광주') return '광주';
-    if (provinceName === '부산') return '부산';
-    if (provinceName === '울산') return '울산';
-    if (provinceName === '제주도') return '제주';
+  private formatCityNameForVisitKorea(provinceName: string) {
+    if (provinceName === '서울') return '서울특별시';
+    if (provinceName === '인천') return '인천광역시';
+    if (provinceName === '대전') return '대전광역시';
+    if (provinceName === '대구') return '대구광역시';
+    if (provinceName === '광주') return '광주광역시';
+    if (provinceName === '부산') return '부산광역시';
+    if (provinceName === '울산') return '울산광역시';
+    if (provinceName === '제주') return '제주특별자치도';
+    if (provinceName === '세종') return '세종특별자치시';
+    if (provinceName === '경기') return '경기도';
+    if (provinceName === '강원') return '강원도';
+    if (provinceName === '충북') return '충청북도';
+    if (provinceName === '충남') return '충청남도';
+    if (provinceName === '경북') return '경상북도';
+    if (provinceName === '경남') return '경상남도';
+    if (provinceName === '전북') return '전라북도';
+    if (provinceName === '전남') return '전라남도';
     return provinceName;
   }
   async createLocalData(data: LocalType[]) {
@@ -209,7 +225,7 @@ export class LocalsService {
   async getLocalDetail(cityCode: number) {
     const local = await this.localRepo.findOne({
       where: { cityCode },
-      relations: ['reviews'],
+      relations: ['reviews', 'files', 'places'],
     });
     return local;
   }
