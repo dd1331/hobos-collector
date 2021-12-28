@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { Local } from '../../locals/entites/local.entity';
 import { Place } from '../../places/entities/place.entity';
@@ -37,8 +38,10 @@ export class Review {
   placeId: number;
 
   @ManyToOne(() => Local, (local) => local.reviews)
+  @JoinColumn({ name: 'local_id' })
   local: Local;
 
   @ManyToOne(() => Place, (place) => place.places)
+  @JoinColumn({ name: 'place_id' })
   place: Place;
 }

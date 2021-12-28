@@ -19,15 +19,26 @@ export class ReviewsService {
     private readonly placesService: PlacesService,
   ) {}
   async create(dto: CreateReviewDto) {
-    const local = await this.localsService.getLocalByCityCode(dto.cityCode);
+    const review = this.reviewRepo.create(dto);
+    if (dto.type === 'local') {
+      const local = await this.localsService.getLocalByCityCode(dto.code);
 
-    if (!local) throw new NotFoundException('지역정보가 존재하지 않습니다');
+      if (!local) throw new NotFoundException('지역정보가 존재하지 않습니다');
 
-    const review = await this.reviewRepo.save({ ...dto, local });
+      review.local = local;
+    }
+    if (dto.type === 'cafe') {
+      const cafe = await this.placesService.getCafe(dto.code);
 
-    if (!review) throw new BadRequestException('리뷰 작성에 실패했습니다');
+      if (!cafe) throw new NotFoundException('장소정보가 존재하지 않습니다');
 
-    return review;
+      review.place = cafe;
+    }
+    const result = await this.reviewRepo.save(review);
+
+    if (!result) throw new BadRequestException('리뷰 작성에 실패했습니다');
+
+    return result;
   }
 
   async getReviews(code, type) {
@@ -40,6 +51,14 @@ export class ReviewsService {
       const cafe = await this.placesService.getCafeDetail(code);
       where = { placeId: cafe.id };
     }
+    console.log('ReviewsService -> getReviews -> where', where);
+    console.log(
+      'ReviewsService -> getReviews -> where',
+      await this.reviewRepo.find({
+        order: { createdAt: 'DESC' },
+        where,
+      }),
+    );
     return this.reviewRepo.find({
       where,
       order: { createdAt: 'DESC' },

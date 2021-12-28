@@ -87,6 +87,9 @@ export class PlacesService {
       relations: ['files'],
     });
   }
+  async getCafe(id) {
+    return await this.placeRepo.findOne(id);
+  }
 
   // @Cron(CronExpression.EVERY_10_SECONDS)
   private async createSeedPlaceData(category = '카페') {
