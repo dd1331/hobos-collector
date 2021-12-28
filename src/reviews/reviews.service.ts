@@ -28,8 +28,12 @@ export class ReviewsService {
     return review;
   }
 
-  findAll() {
-    return `This action returns all reviews`;
+  async getReviews(cityCode) {
+    const local = await this.localsService.getLocalByCityCode(cityCode);
+    return this.reviewRepo.find({
+      where: { local },
+      order: { createdAt: 'DESC' },
+    });
   }
 
   findOne(id: number) {

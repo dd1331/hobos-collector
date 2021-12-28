@@ -31,6 +31,7 @@ export class LocalsService {
     option?: LocalRankingOption,
   ): Promise<LocalRankingResult[]> {
     const take = option?.take || 9;
+    const skip = option?.page ? (option?.page - 1) * take : 0;
     const where: FindConditions<Local> = {
       townCode: IsNull(),
       cityCode: Not(IsNull()),
@@ -42,6 +43,7 @@ export class LocalsService {
       where,
       relations: ['files'],
       take,
+      skip,
     });
 
     const localRankingResults = await this.addWeatherToLocalRankingResult(
@@ -263,9 +265,10 @@ export class LocalsService {
     if (name === '제주') return '제주특별자치도';
   }
 }
-type LocalRankingOption = {
+export type LocalRankingOption = {
   take?: number;
-  provinceName: string;
+  provinceName?: string;
+  page?: number;
 };
 type LocalRankingResult = Local & {
   o3Value: number;

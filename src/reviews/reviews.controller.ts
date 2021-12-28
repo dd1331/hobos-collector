@@ -8,6 +8,7 @@ import {
   Delete,
   UsePipes,
   ValidationPipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -23,9 +24,10 @@ export class ReviewsController {
     return this.reviewsService.create(createReviewDto);
   }
 
-  @Get()
-  findAll() {
-    return this.reviewsService.findAll();
+  @UsePipes(ValidationPipe)
+  @Get(':cityCode')
+  getReviews(@Param('cityCode', ParseIntPipe) cityCode) {
+    return this.reviewsService.getReviews(cityCode);
   }
 
   @Get(':id')
