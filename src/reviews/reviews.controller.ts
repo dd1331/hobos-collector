@@ -3,16 +3,13 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
   UsePipes,
   ValidationPipe,
   ParseIntPipe,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -25,23 +22,14 @@ export class ReviewsController {
   }
 
   @UsePipes(ValidationPipe)
-  @Get(':cityCode')
-  getReviews(@Param('cityCode', ParseIntPipe) cityCode) {
-    return this.reviewsService.getReviews(cityCode);
+  @Get('local/:cityCode')
+  getLocalReviews(@Param('cityCode', ParseIntPipe) cityCode) {
+    return this.reviewsService.getReviews(cityCode, 'local');
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reviewsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
-    return this.reviewsService.update(+id, updateReviewDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reviewsService.remove(+id);
+  @UsePipes(ValidationPipe)
+  @Get('cafe/:cafeCode')
+  getCafeReviews(@Param('cafeCode', ParseIntPipe) cafeCode) {
+    return this.reviewsService.getReviews(cafeCode, 'cafe');
   }
 }

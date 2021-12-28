@@ -134,4 +134,12 @@ describe('PlacesService', () => {
       ).toBeTruthy();
     });
   });
+  describe('getCafeDetail', () => {
+    it('성공', async () => {
+      const cafeCode = 841;
+      await request(agent)
+        .get(`/places/cafe/${cafeCode}`)
+        .expect(HttpStatus.OK);
+    });
+  });
 });

@@ -10,5 +10,6 @@ import { FileEntity } from '../file.entity';
   imports: [TypeOrmModule.forFeature([Place, FileEntity]), LocalsModule],
   controllers: [PlacesController],
   providers: [PlacesService],
+  exports: [PlacesService],
 })
 export class PlacesModule {}

@@ -9,12 +9,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Review } from './entities/review.entity';
 import { Repository } from 'typeorm';
 import { LocalsService } from '../locals/locals.service';
+import { PlacesService } from '../places/places.service';
 
 @Injectable()
 export class ReviewsService {
   constructor(
     @InjectRepository(Review) private readonly reviewRepo: Repository<Review>,
     private readonly localsService: LocalsService,
+    private readonly placesService: PlacesService,
   ) {}
   async create(dto: CreateReviewDto) {
     const local = await this.localsService.getLocalByCityCode(dto.cityCode);
@@ -28,10 +30,18 @@ export class ReviewsService {
     return review;
   }
 
-  async getReviews(cityCode) {
-    const local = await this.localsService.getLocalByCityCode(cityCode);
+  async getReviews(code, type) {
+    let where = {};
+    if (type === 'local') {
+      const local = await this.localsService.getLocalByCityCode(code);
+      where = { localId: local.id };
+    }
+    if (type === 'cafe') {
+      const cafe = await this.placesService.getCafeDetail(code);
+      where = { placeId: cafe.id };
+    }
     return this.reviewRepo.find({
-      where: { local },
+      where,
       order: { createdAt: 'DESC' },
     });
   }

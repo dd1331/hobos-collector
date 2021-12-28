@@ -5,6 +5,8 @@ import {
   ValidationPipe,
   Get,
   Query,
+  Param,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { PlacesService } from './places.service';
 import { CreatePlaceDto } from './dto/create-place.dto';
@@ -20,5 +22,9 @@ export class PlacesController {
   @Get('cafe/ranking')
   getCafeRanking(@Query() dto) {
     return this.placesService.getCafeRanking(dto);
+  }
+  @Get('cafe/:cafeCode')
+  getCafeDetail(@Param('cafeCode', ParseIntPipe) cafeCode: number) {
+    return this.placesService.getCafeDetail(cafeCode);
   }
 }

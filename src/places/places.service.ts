@@ -63,6 +63,7 @@ export class PlacesService {
   }
   async getCafeRanking(search: PlaceSearchOption) {
     const take = search.take || 8;
+    const skip = search?.page ? (search?.page - 1) * take : 0;
     const { provinceName } = search;
     let where;
     if (provinceName) {
@@ -75,7 +76,14 @@ export class PlacesService {
     return await this.placeRepo.find({
       where,
       take,
+      skip,
       order: { title: 'DESC' },
+      relations: ['files'],
+    });
+  }
+  async getCafeDetail(id) {
+    return await this.placeRepo.findOne({
+      where: { id },
       relations: ['files'],
     });
   }
@@ -182,4 +190,5 @@ export class PlacesService {
 type PlaceSearchOption = {
   take?: number;
   provinceName?: string;
+  page: number;
 };

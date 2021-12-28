@@ -9,6 +9,7 @@ import { FileEntity } from '../file.entity';
 import { Local } from '../locals/entites/local.entity';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Place } from '../places/entities/place.entity';
+import { PlacesService } from '../places/places.service';
 
 describe('ReviewsService', () => {
   let service: ReviewsService;
@@ -28,6 +29,7 @@ describe('ReviewsService', () => {
       providers: [
         ReviewsService,
         LocalsService,
+        PlacesService,
         { provide: getRepositoryToken(Review), useValue: mockedReviewRepo },
         { provide: getRepositoryToken(Weather), useValue: {} },
         { provide: getRepositoryToken(FileEntity), useValue: {} },

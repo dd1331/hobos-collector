@@ -56,4 +56,22 @@ describe('Reviews', () => {
       .send(dto)
       .expect(HttpStatus.BAD_REQUEST);
   });
+  describe('getLocalReviews', () => {
+    it('성공', async () => {
+      const cityCode = 11100;
+      const { body } = await request(agent)
+        .get(`/reviews/local/${cityCode}`)
+        .expect(HttpStatus.OK);
+      console.log('body', body);
+    });
+  });
+  describe('getCafeReviews', () => {
+    it('성공', async () => {
+      const cafeCode = 841;
+      const { body } = await request(agent)
+        .get(`/reviews/cafe/${cafeCode}`)
+        .expect(HttpStatus.OK);
+      console.log('body', body);
+    });
+  });
 });

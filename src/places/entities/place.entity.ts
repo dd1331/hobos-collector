@@ -46,4 +46,7 @@ export class Place {
 
   @OneToMany(() => FileEntity, (file) => file.place)
   files: FileEntity[];
+
+  @OneToMany(() => Place, (review) => review.places)
+  places: Place[];
 }
