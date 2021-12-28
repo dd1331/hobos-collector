@@ -232,9 +232,10 @@ export class LocalsService {
     return local;
   }
 
-  async getLocalByProvinceName(provinceName: string) {
-    return await this.localRepo.findOne({ where: { provinceName } });
+  async getLocalsByProvinceName(provinceName: string) {
+    return await this.localRepo.find({ where: { provinceName } });
   }
+
   async getLocalByCityName(originalCityName: string) {
     const isSejong = originalCityName === '세종시';
     const cityName = isSejong ? '세종' : originalCityName;
@@ -255,7 +256,7 @@ export class LocalsService {
     if (name === '울산') return '울산';
     if (name === '세종') return '세종';
     if (name === '경기') return '경기도';
-    if (name === '강원') return '강원도';
+    if (name === '강원') return '강원도';
     if (name === '충북') return '충청북도';
     if (name === '충남') return '충청남도';
     if (name === '전북') return '전라북도';
@@ -278,7 +279,6 @@ type LocalRankingResult = Local & {
   temp: number;
   feelsLike: number;
   humidity: number;
-  // images: FileEntity[];
 };
 type LocalType = {
   provinceCode: string;

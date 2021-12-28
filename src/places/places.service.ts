@@ -7,7 +7,7 @@ import {
 } from '../constants/locals.constants';
 import { LocalsService } from '../locals/locals.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Place } from '../places/entities/place.entity';
 import axios from 'axios';
 import { Local } from 'src/locals/entites/local.entity';
@@ -61,9 +61,19 @@ export class PlacesService {
       console.log('PlacesService -> error', error);
     }
   }
-  async getCafeRanking(search) {
+  async getCafeRanking(search: PlaceSearchOption) {
     const take = search.take || 8;
+    const { provinceName } = search;
+    let where;
+    if (provinceName) {
+      const locals = await this.localsService.getLocalsByProvinceName(
+        provinceName,
+      );
+      const localIds = locals.map((local) => local.id);
+      where = { localId: In(localIds) };
+    }
     return await this.placeRepo.find({
+      where,
       take,
       order: { title: 'DESC' },
       relations: ['files'],
@@ -169,4 +179,7 @@ export class PlacesService {
     return await Promise.all(getPlacesMissingImage);
   }
 }
-// #main_pack > section.sc_new.sp_nimage._prs_img._imageSearchPC > div > div.photo_group._listGrid > div.photo_tile._grid > div:nth-child(1) > div > div.thumb > a > img
+type PlaceSearchOption = {
+  take?: number;
+  provinceName?: string;
+};

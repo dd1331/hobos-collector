@@ -107,13 +107,31 @@ describe('PlacesService', () => {
     });
   });
   describe('getCafeRanking', () => {
-    it('', async () => {
-      const dto = { take: 10 };
+    it('성공', async () => {
+      const { body } = await request(agent)
+        .get(`/places/cafe/ranking`)
+        .expect(HttpStatus.OK);
+      expect(body.length).toBe(8);
+    });
+    it('n개씩 보기', async () => {
+      const dto = { take: 30 };
       const { body } = await request(agent)
         .get(`/places/cafe/ranking`)
         .query(dto)
         .expect(HttpStatus.OK);
       expect(body.length).toBe(dto.take);
+    });
+    const provinceNames = ['경기', '강원', '제주'];
+    each(provinceNames).it('시/도 필터링', async (provinceName) => {
+      const dto = { take: 10, provinceName };
+      const { body } = await request(agent)
+        .get(`/places/cafe/ranking`)
+        .query(dto)
+        .expect(HttpStatus.OK);
+      expect(body.length).toBe(dto.take);
+      expect(
+        body.every((cafe) => cafe.address.includes(provinceName)),
+      ).toBeTruthy();
     });
   });
 });
