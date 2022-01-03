@@ -26,14 +26,14 @@ describe('Reviews', () => {
     it('리뷰 작성 성공', async () => {
       const dto: CreateReviewDto = {
         userId: 3,
-        cityCode: '11100',
+        code: '11100',
         content: 'tes',
+        type: 'local',
       };
       const { body } = await request(agent).post('/reviews').send(dto);
       expect(body).toEqual(
         expect.objectContaining({
           userId: dto.userId,
-          cityCode: dto.cityCode,
           content: dto.content,
           updatedAt: expect.any(String),
           createdAt: expect.any(String),
@@ -41,13 +41,13 @@ describe('Reviews', () => {
           deletedAt: null,
         }),
       );
-      expect(body.local.cityCode).toBe(dto.cityCode);
+      expect(body.local.cityCode).toBe(dto.code);
     });
   });
   const dtos2fail: Partial<CreateReviewDto & { status: number }>[] = [
     { content: 'test', userId: 3 },
-    { userId: 3, cityCode: '' },
-    { cityCode: '10', content: '123123' },
+    { userId: 3, code: '' },
+    { code: '10', content: '123123' },
   ];
 
   each(dtos2fail).it('리뷰 작성 유효하지 않은 요청', async (dto) => {
@@ -62,7 +62,6 @@ describe('Reviews', () => {
       const { body } = await request(agent)
         .get(`/reviews/local/${cityCode}`)
         .expect(HttpStatus.OK);
-      console.log('body', body);
     });
   });
   describe('getCafeReviews', () => {
@@ -71,7 +70,6 @@ describe('Reviews', () => {
       const { body } = await request(agent)
         .get(`/reviews/cafe/${cafeCode}`)
         .expect(HttpStatus.OK);
-      console.log('body', body);
     });
   });
 });

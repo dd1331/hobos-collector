@@ -18,7 +18,10 @@ describe('ReviewsService', () => {
   beforeEach(async () => {
     mockedReviewRepo = {
       save: (dto: CreateReviewDto): Promise<Partial<Review>> =>
-        Promise.resolve({ ...dto }),
+        Promise.resolve(dto),
+      create: (dto: Partial<CreateReviewDto>): Partial<Review> => {
+        return dto;
+      },
     };
     mockedLocalRepo = {
       findOne: (option): Promise<Partial<Local>> => {
@@ -46,13 +49,18 @@ describe('ReviewsService', () => {
   });
   describe('create', () => {
     const userId = 3;
-    const cityCode = '10';
-    const dto = { userId, cityCode, content: 'test' };
+    const code = '10';
+    const dto: CreateReviewDto = {
+      userId,
+      code,
+      content: 'test',
+      type: 'local',
+    };
     it('리뷰 작성 성공', async () => {
-      const result = await service.create(dto);
-      const local = await mockedLocalRepo.findOne({ cityCode });
-      expect(result.userId).toBe(userId);
-      expect(result).toEqual({ ...dto, local });
+      const review = await service.create(dto);
+      expect(review.userId).toBe(userId);
+      expect(review).toEqual(dto);
+      expect(review.local.cityCode).toBe(code);
     });
     it('리뷰할 지역 정보 없음', async () => {
       mockedLocalRepo.findOne = () => Promise.resolve();

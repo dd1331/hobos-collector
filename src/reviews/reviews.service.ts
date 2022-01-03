@@ -18,7 +18,7 @@ export class ReviewsService {
     private readonly localsService: LocalsService,
     private readonly placesService: PlacesService,
   ) {}
-  async create(dto: CreateReviewDto) {
+  async create(dto: CreateReviewDto): Promise<Review> {
     const review = this.reviewRepo.create(dto);
     if (dto.type === 'local') {
       const local = await this.localsService.getLocalByCityCode(dto.code);
@@ -51,14 +51,6 @@ export class ReviewsService {
       const cafe = await this.placesService.getCafeDetail(code);
       where = { placeId: cafe.id };
     }
-    console.log('ReviewsService -> getReviews -> where', where);
-    console.log(
-      'ReviewsService -> getReviews -> where',
-      await this.reviewRepo.find({
-        order: { createdAt: 'DESC' },
-        where,
-      }),
-    );
     return this.reviewRepo.find({
       where,
       order: { createdAt: 'DESC' },

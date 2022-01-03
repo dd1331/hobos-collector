@@ -5,6 +5,7 @@ import { INestApplication, HttpStatus } from '@nestjs/common';
 import { ReviewsService } from '../reviews/reviews.service';
 import * as request from 'supertest';
 import each from 'jest-each';
+import { CreateReviewDto } from '../reviews/dto/create-review.dto';
 
 describe('LocalsService', () => {
   jest.setTimeout(300000);
@@ -148,10 +149,11 @@ describe('LocalsService', () => {
     });
     it('성공 + 리뷰', async () => {
       const cityCode = 11020;
-      const dto = {
+      const dto: CreateReviewDto = {
         userId: 3,
         content: '성공 + 리뷰',
-        cityCode: cityCode.toString(),
+        code: cityCode.toString(),
+        type: 'local',
       };
       await reviewsService.create(dto);
       const { body } = await request(agent).get(`/locals/${cityCode}`);
