@@ -18,8 +18,8 @@ export class CollectorsService {
         'https://sgisapi.kostat.go.kr/OpenAPI3/auth/authentication.json';
       const { data } = await axios.get(url, {
         params: {
-          consumer_key: 'e92028f7daf04e1588d0',
-          consumer_secret: '6082570df221445995d1',
+          consumer_key: '6e4bd6018695432c8b37',
+          consumer_secret: '745790bee67047919e10',
         },
       });
       return data;
