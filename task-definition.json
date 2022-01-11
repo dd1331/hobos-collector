@@ -20,7 +20,13 @@
         }
       },
       "entryPoint": null,
-      "portMappings": [],
+      "portMappings": [
+        {
+          "hostPort": 4000,
+          "protocol": "tcp",
+          "containerPort": 4000
+        }
+      ],
       "command": null,
       "linuxParameters": null,
       "cpu": 0,
