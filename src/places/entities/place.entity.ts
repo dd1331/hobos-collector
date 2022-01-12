@@ -37,6 +37,7 @@ export class Place {
 
   @Column()
   mapy: string;
+
   @Column({ name: 'local_id', nullable: true })
   localId: number;
 

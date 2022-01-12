@@ -51,6 +51,9 @@ export class ExcelsService {
     if (name === '전라남도') return '전남';
     if (name === '경상북도') return '경북';
     if (name === '경상남도') return '경남';
+    if (name === '대구광역시') return '대구';
+    if (name === '서울특별시') return '서울';
+    if (name === '부산광역시') return '부산';
     if (name === '제주특별자치도') return '제주';
     return name;
   }

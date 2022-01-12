@@ -91,7 +91,7 @@ export class PlacesService {
     return await this.placeRepo.findOne(id);
   }
 
-  // @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   private async createSeedPlaceData(category = '카페') {
     try {
       const locals = await this.localsService.getCityList();
@@ -110,7 +110,7 @@ export class PlacesService {
 
   private async getLocalsMissingPlace(locals: Local[]) {
     const localsMissingPlace = locals.map(async (local) => {
-      const place = await this.placeRepo.findOne({
+      const place = await this.placeRepo.count({
         where: { localId: local.id },
       });
       if (place) return;
@@ -121,9 +121,14 @@ export class PlacesService {
 
   private async createPlaceByAdmin(local: Local, category: string) {
     this.logger.debug(local.cityName, category);
-    const query = `${local.cityName} ${category}`;
+    const query = `${local.provinceName} ${local.cityName} ${category}`;
     const placeDtos = await this.getPlaceInfoFromNaver(query);
     const places = placeDtos.map(async (placeInfo) => {
+      const count = await this.placeRepo.count({
+        where: { address: placeInfo.address, title: placeInfo.title },
+      });
+      if (count) return;
+
       return await this.placeRepo.save({ ...placeInfo, local });
     });
     await Promise.all(places);
