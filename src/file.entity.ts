@@ -19,7 +19,7 @@ export class FileEntity {
   @ManyToOne(() => Local, (local) => local.files)
   local: Local;
 
-  @Column({ name: 'place_id' })
+  @Column({ name: 'place_id', nullable: true })
   placeId: number;
 
   @ManyToOne(() => Place, (place) => place.files)

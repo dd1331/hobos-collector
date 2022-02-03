@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Repository,
@@ -16,6 +16,7 @@ import {
   PROVINCE_LIST_FOR_VISIT_KOREA,
   VISIT_KOREA_URL_FOR_IMAGE,
 } from '../constants/locals.constants';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class LocalsService {
@@ -27,6 +28,7 @@ export class LocalsService {
     @InjectRepository(Local)
     private readonly localRepo: Repository<Local>,
   ) {}
+  private readonly logger = new Logger(LocalsService.name);
   async getLocalRanking(
     option?: LocalRankingOption,
   ): Promise<LocalRankingResult[]> {
@@ -64,39 +66,35 @@ export class LocalsService {
     return await Promise.all(results);
   }
 
-  async getLocalImagesFromVisitKorea(
-    cityName: string,
-  ): Promise<{ title: string; url: string }[]> {
+  async getLocalImagesFromVisitKorea(city: {
+    code: number;
+    name: string;
+  }): Promise<{ title: string; url: string }[]> {
     try {
-      const local = await this.getLocalByCityName(cityName);
+      const local = await this.getLocalByCityName(city.name);
       const [matchingProvince] = PROVINCE_LIST_FOR_VISIT_KOREA.filter(
         (province) => province.name === local.provinceName,
       );
-
-      const sigunguCodes = await this.getAreaCodesFromVisitKorea(
-        matchingProvince.code,
-      );
-      const promises = sigunguCodes.map(async (sigungu) => {
-        const params = this.getVisitKoreaImageParams({
-          areaCode: matchingProvince.code,
-          sigunguCode: sigungu.code,
-        });
-
-        const result = await axios.get(VISIT_KOREA_URL_FOR_IMAGE, { params });
-        const totalCount = result.data.response.body.totalCount;
-        if (!totalCount) return [];
-        const innerImages = result.data.response.body.items.item;
-        return innerImages;
+      const params = this.getVisitKoreaImageParams({
+        areaCode: matchingProvince.code,
+        sigunguCode: city.code,
       });
-      const images = await Promise.all(promises);
 
-      return images.map((i) => {
+      const result = await axios.get(VISIT_KOREA_URL_FOR_IMAGE, { params });
+      const totalCount = result.data.response.body.totalCount;
+
+      if (!totalCount) return;
+
+      const innerImages: any[] = result.data.response.body.items.item;
+
+      return innerImages.map((i) => {
         return { title: i.title, url: i.firstimage };
       });
     } catch (error) {
       console.log('LocalsService -> error', error);
     }
   }
+
   private getVisitKoreaImageParams(matchingProvince: {
     areaCode: number;
     sigunguCode: number;
@@ -119,15 +117,19 @@ export class LocalsService {
   async getAreaCodesFromVisitKorea(
     areaCode?: number,
   ): Promise<{ code: number; name: string }[]> {
-    const params = this.getParams4areaCode(areaCode);
-    const { data } = await axios.get(VISIT_KOREA_AREA_CODE_URL, {
-      params,
-    });
-    const areaInfo = data.response.body.items.item;
-    // TODO exception
-    if (!areaInfo.length) return [{ code: -1, name: 'not found' }];
+    try {
+      const params = this.getParams4areaCode(areaCode);
+      const { data } = await axios.get(VISIT_KOREA_AREA_CODE_URL, {
+        params,
+      });
+      const areaInfo = data.response.body.items.item;
+      // TODO exception
+      if (!areaInfo.length) return [{ code: -1, name: 'not found' }];
 
-    return areaInfo;
+      return areaInfo;
+    } catch (error) {
+      console.log('error', error);
+    }
   }
 
   private getParams4areaCode(areaCode?: number) {
@@ -140,38 +142,37 @@ export class LocalsService {
     return { ServiceKey, numOfRows, MobileOS, MobileApp, areaCode };
   }
 
+  // @Cron(CronExpression.EVERY_MINUTE)
   async createImage4Local() {
     try {
       const areaCodes = await this.getAreaCodes();
       const locals = await this.addImagesToLocal(areaCodes.flat());
-
       return locals;
     } catch (error) {
       console.log('createImage4Local -> error', error);
     }
   }
   private async getAreaCodes() {
-    const areaCodes = PROVINCE_LIST_FOR_VISIT_KOREA.map(
-      async (province) => await this.getAreaCodesFromVisitKorea(province.code),
+    const areaCodes = PROVINCE_LIST_FOR_VISIT_KOREA.map(async (province) =>
+      this.getAreaCodesFromVisitKorea(province.code),
     );
     return await Promise.all(areaCodes);
   }
 
   private async addImagesToLocal(areaCodes: { code: number; name: string }[]) {
     try {
-      const locals = areaCodes.flat().map(async (city) => {
+      const locals = areaCodes.map(async (city) => {
         const local = await this.getLocalByCityName(city.name);
         // // TODO exception 청원군 마산시 진해시 북제주군 남제주군
         if (local) {
-          const formattedCityName = city.name;
-          const image = await this.getLocalImagesFromVisitKorea(
-            formattedCityName,
-          );
+          const images = await this.getLocalImagesFromVisitKorea(city);
 
-          const files = await this.fileRepo.save(image);
+          const files = await this.fileRepo.save(images);
           local.files = files;
 
           await this.localRepo.save(local);
+
+          this.logger.debug(local.cityName);
 
           return local;
         }

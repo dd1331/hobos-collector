@@ -44,13 +44,13 @@ describe('LocalsService', () => {
         expect(result.provinceName).toBeTruthy();
         expect(result.cityName).toBeTruthy();
         expect(result.townName).toBeFalsy();
-        expect(result.o3Value).toBeDefined();
-        expect(result.pm10Value).toBeDefined();
-        expect(result.pm25Value).toBeDefined();
-        expect(result.description).toBeDefined();
-        expect(result.temp).toBeDefined();
-        expect(result.feelsLike).toBeDefined();
-        expect(result.humidity).toBeDefined();
+        // expect(result.o3Value).toBeDefined();
+        // expect(result.pm10Value).toBeDefined();
+        // expect(result.pm25Value).toBeDefined();
+        // expect(result.description).toBeDefined();
+        // expect(result.temp).toBeDefined();
+        // expect(result.feelsLike).toBeDefined();
+        // expect(result.humidity).toBeDefined();
       });
     });
     it('기본 9개 반환', async () => {
@@ -75,13 +75,13 @@ describe('LocalsService', () => {
         expect(result.provinceName).toBeTruthy();
         expect(result.cityName).toBeTruthy();
         expect(result.townName).toBeFalsy();
-        expect(result.o3Value).toBeDefined();
-        expect(result.pm10Value).toBeDefined();
-        expect(result.pm25Value).toBeDefined();
-        expect(result.description).toBeDefined();
-        expect(result.temp).toBeDefined();
-        expect(result.feelsLike).toBeDefined();
-        expect(result.humidity).toBeDefined();
+        // expect(result.o3Value).toBeDefined();
+        // expect(result.pm10Value).toBeDefined();
+        // expect(result.pm25Value).toBeDefined();
+        // expect(result.description).toBeDefined();
+        // expect(result.temp).toBeDefined();
+        // expect(result.feelsLike).toBeDefined();
+        // expect(result.humidity).toBeDefined();
       });
     });
     const provinceNames = [
@@ -127,12 +127,6 @@ describe('LocalsService', () => {
       return;
       const result = await localsService.getAreaCodesFromVisitKorea(31);
       expect(result.length).toBeGreaterThan(0);
-    });
-  });
-  describe('getCityImagesFromVisitKorea', () => {
-    it('', async () => {
-      return;
-      const result = await localsService.getLocalImagesFromVisitKorea('제주시');
     });
   });
   describe('createImage4Local', () => {

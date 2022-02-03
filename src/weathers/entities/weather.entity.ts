@@ -8,7 +8,7 @@ export class Weather {
   @Column({ name: 'province_name' })
   provinceName: string;
 
-  @Column({ name: 'city_name', unique: true })
+  @Column({ name: 'city_name' })
   cityName: string;
 
   @Column({ name: 'measured_at' })

@@ -91,7 +91,7 @@ export class PlacesService {
     return await this.placeRepo.findOne(id);
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  // @Cron(CronExpression.EVERY_10_SECONDS)
   private async createSeedPlaceData(category = '카페') {
     try {
       const locals = await this.localsService.getCityList();

@@ -73,6 +73,7 @@ export class WeathersService {
     try {
       return await this.weatherRepo.save(dto);
     } catch (error) {
+      console.log('WeathersService -> upsertAirPolutionInfo -> error', error);
       if (error.code === 'ER_DUP_ENTRY') return true;
     }
   }
@@ -149,6 +150,7 @@ export class WeathersService {
   }
 
   @Cron(CronExpression.EVERY_5_MINUTES)
+  // @Cron(CronExpression.EVERY_10_SECONDS)
   async updateWeatherInfo() {
     this.logger.debug(
       `updateWeatherInfo started ${WeathersService.name} ${Date.now()}`,
@@ -187,18 +189,23 @@ export class WeathersService {
   private async getWeatherFromOpenWeather(
     cityName: string,
   ): Promise<OpenWeather> {
-    const OPEN_WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather';
-    const params = this.getOpenWeatherParams(cityName);
-    const { data } = await axios.get(OPEN_WEATHER_URL, {
-      params,
-    });
-    const { main, weather } = data;
+    try {
+      const OPEN_WEATHER_URL =
+        'https://api.openweathermap.org/data/2.5/weather';
+      const params = this.getOpenWeatherParams(cityName);
+      const { data } = await axios.get(OPEN_WEATHER_URL, {
+        params,
+      });
+      const { main, weather } = data;
 
-    const description = weather[0].description;
-    const feelsLike = Math.round(main.temp);
-    const temp = Math.round(main.feels_like);
-    const humidity = Math.round(main.humidity);
-    return { description, feelsLike, temp, humidity };
+      const description = weather[0].description;
+      const feelsLike = Math.round(main.temp);
+      const temp = Math.round(main.feels_like);
+      const humidity = Math.round(main.humidity);
+      return { description, feelsLike, temp, humidity };
+    } catch (error) {
+      console.log('WeathersService -> error', error);
+    }
   }
 
   private getOpenWeatherParams(cityName: string) {
