@@ -115,20 +115,6 @@ describe('LocalsService', () => {
       ).toBeTruthy();
     });
   });
-  describe('getAreaCodesFromVisitKorea', () => {
-    it('', async () => {
-      return;
-      const result = await localsService.getAreaCodesFromVisitKorea();
-      expect(result.length).toBeGreaterThan(0);
-    });
-  });
-  describe('getCityCodeFromVisitKorea', () => {
-    it('', async () => {
-      return;
-      const result = await localsService.getAreaCodesFromVisitKorea(31);
-      expect(result.length).toBeGreaterThan(0);
-    });
-  });
   describe('createImage4Local', () => {
     it('', async () => {
       return;
