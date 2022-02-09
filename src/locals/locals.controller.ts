@@ -12,4 +12,8 @@ export class LocalsController {
   getLocalDetailBy(@Param('cityCode', ParseIntPipe) cityCode: number) {
     return this.localsService.getLocalDetail(cityCode);
   }
+  @Get(':cityCode/neighbors')
+  getLocalNeighbors(@Param('cityCode', ParseIntPipe) cityCode: number) {
+    return this.localsService.getLocalNeighbors(cityCode);
+  }
 }

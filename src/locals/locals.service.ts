@@ -232,6 +232,20 @@ export class LocalsService {
     });
     return local;
   }
+  async getLocalNeighbors(cityCode: number) {
+    const local = await this.localRepo.findOne({
+      where: { cityCode },
+      relations: ['places'],
+    });
+    const promises = local.places.map(async (p) => {
+      const placeId = p.id;
+      const { url } = await this.fileRepo.findOne({ where: { placeId } });
+      if (url) return { url, ...p };
+      return p;
+    });
+    const result = await Promise.all(promises);
+    return result;
+  }
 
   async getLocalsByProvinceName(provinceName: string) {
     return await this.localRepo.find({ where: { provinceName } });
