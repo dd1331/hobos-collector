@@ -65,7 +65,11 @@ export class ReviewsService {
     return `This action updates a #${id} review`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} review`;
+  async remove(id: number) {
+    const review = await this.reviewRepo.findOne(id);
+    if (!review) throw new NotFoundException('리뷰가 존재하지 않습니다');
+
+    review.deletedAt = new Date();
+    return await this.reviewRepo.save(review);
   }
 }

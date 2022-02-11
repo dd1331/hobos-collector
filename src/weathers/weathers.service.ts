@@ -85,7 +85,7 @@ export class WeathersService {
           provinceName,
           measuredAt: LessThanOrEqual(dayjs().subtract(1, 'hour').toDate()),
         },
-        take: 10,
+        take: 20,
       });
 
       if (result.length > 0) return result;

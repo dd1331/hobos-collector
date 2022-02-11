@@ -7,6 +7,7 @@ import {
   UsePipes,
   ValidationPipe,
   ParseIntPipe,
+  Delete,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -31,5 +32,10 @@ export class ReviewsController {
   @Get('cafe/:cafeCode')
   getCafeReviews(@Param('cafeCode', ParseIntPipe) cafeCode) {
     return this.reviewsService.getReviews(cafeCode, 'cafe');
+  }
+
+  @Delete(':id')
+  removeLocalReview(@Param('id', ParseIntPipe) id: number) {
+    return this.reviewsService.remove(id);
   }
 }
